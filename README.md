@@ -1,4 +1,4 @@
-# 🦇 BlackBatBook — Free GitBook Alternative
+# 🐱 BlackCatBook — Free GitBook Alternative
 
 > A free, open-source documentation platform with 5 beautiful themes, rich text editor, image upload, and search. No backend required — works as a pure static site.
 
@@ -61,7 +61,7 @@ Switch themes using the **☀️ button** at the bottom-right corner.
 ## 📁 File Structure
 
 ```
-BlackBatBook/
+BlackCatBook/
 ├── index.html    ← Main page (open this)
 ├── styles.css    ← All 5 themes + layout
 ├── app.js        ← Routing, editor, search
@@ -93,4 +93,4 @@ PRs welcome! For major changes, open an issue first.
 
 ## 📄 License
 
-MIT © 2026 BlackBatBook
+MIT © 2026 BlackCatBook
