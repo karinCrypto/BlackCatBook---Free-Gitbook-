@@ -22,7 +22,7 @@ const THEMES = [
 export default function WorkspacePage() {
   const { workspaceId } = useParams<{ workspaceId: string }>()
   const router = useRouter()
-  const { pages, tree, createPage, updatePage, deletePage, duplicatePage, reorderPages } = usePages(workspaceId)
+  const { pages, tree, createPage, updatePage, deletePage, duplicatePage, reorderPages, movePage } = usePages(workspaceId)
   const [wsName, setWsName] = useState('')
   const [currentPageId, setCurrentPageId] = useState<string|null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -103,6 +103,10 @@ export default function WorkspacePage() {
     if (!currentPageId) return
     updatePage(currentPageId, { content, title })
     setIsEditing(false)
+  }
+
+  function handleMove(id: string, newParentId: string | null) {
+    movePage(id, newParentId)
   }
 
   function handleDuplicate(id: string) {
@@ -260,6 +264,7 @@ export default function WorkspacePage() {
               onRename={handleRename}
                 onEmojiChange={handleEmojiChange}
                 onDuplicate={handleDuplicate}
+                onMove={handleMove}
             />
           )}
         </aside>
@@ -284,6 +289,7 @@ export default function WorkspacePage() {
                 onRename={handleRename}
                 onEmojiChange={handleEmojiChange}
                 onDuplicate={handleDuplicate}
+                onMove={handleMove}
               />
             </aside>
           </>

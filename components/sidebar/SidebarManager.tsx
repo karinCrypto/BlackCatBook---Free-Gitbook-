@@ -15,11 +15,12 @@ type Props = {
   onRename: (id: string, title: string) => void
   onEmojiChange: (id: string, emoji: string) => void
   onDuplicate: (id: string) => void
+  onMove: (id: string, newParentId: string | null) => void
 }
 
 export default function SidebarManager({
   workspaceName, tree, pages, currentPageId,
-  onNavigate, onCreatePage, onDelete, onRename, onEmojiChange, onDuplicate
+  onNavigate, onCreatePage, onDelete, onRename, onEmojiChange, onDuplicate, onMove
 }: Props) {
   const [search, setSearch] = useState('')
   const [newItemId, setNewItemId] = useState<string|null>(null)
@@ -113,12 +114,14 @@ export default function SidebarManager({
               <SidebarItem key={node.id} node={node} depth={0}
                 currentPageId={currentPageId}
                 autoEdit={newItemId === node.id}
+                allPages={pages}
                 onNavigate={onNavigate}
                 onAddChild={(parentId, type) => { const id = onCreatePage(parentId, type); setNewItemId(id) }}
                 onDelete={onDelete}
                 onRename={(id, title) => { onRename(id, title); setNewItemId(null) }}
                 onEmojiChange={onEmojiChange}
-                onDuplicate={onDuplicate} />
+                onDuplicate={onDuplicate}
+                onMove={onMove} />
             ))}
           </div>
 

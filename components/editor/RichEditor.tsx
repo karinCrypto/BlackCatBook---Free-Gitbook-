@@ -300,14 +300,30 @@ export default function RichEditor({ page, onSave, onDone, onRegisterInsert }: P
 
         {div}
 
-        {btn('글자 색상', () => {},
-          <div style={{ position:'relative' }}>
-            <span style={{ fontSize:'0.85rem', fontWeight:700 }}>A</span>
-            <input type="color" defaultValue="#3b82f6"
-              onChange={e => exec('foreColor', e.target.value)}
-              style={{ position:'absolute', inset:0, opacity:0, width:'100%', height:'100%', cursor:'pointer' }} />
+        {/* 글자 색상 — save selection on mousedown, restore before applying */}
+        <div style={{ position:'relative', width:30, height:30, flexShrink:0 }}
+          onMouseDown={() => {
+            const sel = window.getSelection()
+            if (sel?.rangeCount) savedRange.current = sel.getRangeAt(0).cloneRange()
+          }}>
+          <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:'100%', pointerEvents:'none' }}>
+            <span style={{ fontSize:'0.85rem', fontWeight:700, color:'var(--text-muted)', lineHeight:1 }}>A</span>
+            <span id="color-indicator" style={{ width:14, height:3, background:'#3b82f6', borderRadius:2, display:'block' }} />
           </div>
-        )}
+          <input type="color" defaultValue="#3b82f6" title="글자 색상"
+            onChange={e => {
+              const col = e.target.value
+              const indicator = document.getElementById('color-indicator')
+              if (indicator) indicator.style.background = col
+              if (savedRange.current) {
+                const sel = window.getSelection()
+                sel?.removeAllRanges()
+                sel?.addRange(savedRange.current)
+              }
+              exec('foreColor', col)
+            }}
+            style={{ position:'absolute', inset:0, opacity:0, width:'100%', height:'100%', cursor:'pointer' }} />
+        </div>
 
         {div}
 

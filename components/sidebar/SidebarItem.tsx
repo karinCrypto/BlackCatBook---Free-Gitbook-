@@ -1,6 +1,6 @@
 'use client'
 import { useState, useRef } from 'react'
-import type { PageTreeNode } from '@/lib/localStorage/pages'
+import type { Page, PageTreeNode } from '@/lib/localStorage/pages'
 
 const PAGE_EMOJIS = [
   '📄','📝','📖','📚','📋','📌','📍','🗒️','🗂️','📁',
@@ -14,20 +14,24 @@ type Props = {
   depth: number
   currentPageId?: string
   autoEdit?: boolean
+  allPages: Page[]
   onNavigate: (id: string) => void
   onAddChild: (parentId: string, type: 'page'|'folder') => void
   onDelete: (id: string) => void
   onRename: (id: string, title: string) => void
   onEmojiChange?: (id: string, emoji: string) => void
   onDuplicate?: (id: string) => void
+  onMove?: (id: string, newParentId: string | null) => void
 }
 
-export default function SidebarItem({ node, depth, currentPageId, autoEdit, onNavigate, onAddChild, onDelete, onRename, onEmojiChange, onDuplicate }: Props) {
+export default function SidebarItem({ node, depth, currentPageId, autoEdit, allPages, onNavigate, onAddChild, onDelete, onRename, onEmojiChange, onDuplicate, onMove }: Props) {
   const [open, setOpen] = useState(true)
   const [editing, setEditing] = useState(autoEdit ?? false)
   const [title, setTitle] = useState(node.title)
   const [menu, setMenu] = useState(false)
   const [emojiPicker, setEmojiPicker] = useState(false)
+  const [movePicker, setMovePicker] = useState(false)
+  const [dragOver, setDragOver] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   function finishRename() {
@@ -36,32 +40,78 @@ export default function SidebarItem({ node, depth, currentPageId, autoEdit, onNa
     else setTitle(node.title)
   }
 
+  // Drag source handlers
+  function handleDragStart(e: React.DragEvent) {
+    e.dataTransfer.setData('text/plain', node.id)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  // Drop target handlers (folders only)
+  function handleDragOver(e: React.DragEvent) {
+    if (node.type !== 'folder') return
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    setDragOver(true)
+  }
+
+  function handleDragLeave() {
+    setDragOver(false)
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault()
+    setDragOver(false)
+    if (node.type !== 'folder') return
+    const draggedId = e.dataTransfer.getData('text/plain')
+    if (!draggedId || draggedId === node.id) return
+    // Prevent dropping a folder into its own descendant
+    if (isDescendant(draggedId, node.id)) return
+    onMove?.(draggedId, node.id)
+    setOpen(true)
+  }
+
+  // Check if potentialAncestor is a descendant of id (would create a cycle)
+  function isDescendant(ancestorId: string, nodeId: string): boolean {
+    const children = allPages.filter(p => p.parentId === nodeId)
+    return children.some(c => c.id === ancestorId || isDescendant(ancestorId, c.id))
+  }
+
   const isActive = currentPageId === node.id
   const isFolder = node.type === 'folder'
   const emoji = node.emoji
 
+  // Folders available to move into (excluding self and descendants)
+  const folders = allPages.filter(p =>
+    p.type === 'folder' &&
+    p.id !== node.id &&
+    !isDescendant(p.id, node.id)
+  )
+
   return (
     <div>
       <div className="sidebar-row"
+        draggable
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
         style={{ display:'flex', alignItems:'center', gap:4, padding:`5px 8px 5px ${8 + depth*16}px`,
-          borderRadius:7, cursor:'pointer', position:'relative',
-          background: isActive ? 'var(--accent-light)' : 'transparent',
-          color: isActive ? 'var(--accent-text)' : 'var(--text-muted)' }}
-        onMouseEnter={e => { if(!isActive)(e.currentTarget as HTMLElement).style.background='var(--bg-tertiary)' }}
-        onMouseLeave={e => { if(!isActive)(e.currentTarget as HTMLElement).style.background='transparent' }}>
+          borderRadius:7, cursor:'grab', position:'relative',
+          background: dragOver ? 'var(--accent-light)' : isActive ? 'var(--accent-light)' : 'transparent',
+          color: isActive ? 'var(--accent-text)' : 'var(--text-muted)',
+          outline: dragOver ? '2px dashed var(--accent)' : 'none',
+          transition:'background .1s' }}
+        onMouseEnter={e => { if(!isActive && !dragOver)(e.currentTarget as HTMLElement).style.background='var(--bg-tertiary)' }}
+        onMouseLeave={e => { if(!isActive && !dragOver)(e.currentTarget as HTMLElement).style.background='transparent' }}>
 
-        {/* Emoji or default icon — click to open picker */}
+        {/* Emoji or default icon */}
         <div style={{ position:'relative', flexShrink:0 }}>
           <button
             onClick={e => { e.stopPropagation(); setEmojiPicker(p => !p) }}
             title="이모지 변경"
             style={{ background:'none', border:'none', cursor:'pointer', padding:0, lineHeight:1,
               display:'flex', alignItems:'center', justifyContent:'center',
-              width:18, height:18, fontSize: emoji ? 14 : 12, borderRadius:4,
-              transition:'background .1s' }}
-            onMouseEnter={e => (e.currentTarget.style.background='var(--bg-secondary)')}
-            onMouseLeave={e => (e.currentTarget.style.background='none')}
-          >
+              width:18, height:18, fontSize: emoji ? 14 : 12, borderRadius:4 }}>
             {emoji ? (
               <span>{emoji}</span>
             ) : isFolder ? (
@@ -76,7 +126,7 @@ export default function SidebarItem({ node, depth, currentPageId, autoEdit, onNa
             )}
           </button>
 
-          {/* Emoji picker popup */}
+          {/* Emoji picker */}
           {emojiPicker && (
             <>
               <div style={{ position:'fixed', inset:0, zIndex:59 }} onClick={() => setEmojiPicker(false)} />
@@ -91,7 +141,7 @@ export default function SidebarItem({ node, depth, currentPageId, autoEdit, onNa
                       onClick={() => { onEmojiChange?.(node.id, em); setEmojiPicker(false) }}
                       style={{ width:30, height:30, borderRadius:6, border:'none',
                         background: node.emoji===em ? 'var(--accent-light)' : 'transparent',
-                        fontSize:16, cursor:'pointer', transition:'background .1s' }}
+                        fontSize:16, cursor:'pointer' }}
                       onMouseEnter={e => (e.currentTarget.style.background='var(--bg-tertiary)')}
                       onMouseLeave={e => (e.currentTarget.style.background = node.emoji===em ? 'var(--accent-light)' : 'transparent')}>
                       {em}
@@ -135,7 +185,8 @@ export default function SidebarItem({ node, depth, currentPageId, autoEdit, onNa
             onClick={() => isFolder ? setOpen(o=>!o) : onNavigate(node.id)}
             onDoubleClick={() => setEditing(true)}
             style={{ flex:1, fontSize:'0.875rem', fontWeight: isActive ? 600 : 500,
-              overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', userSelect:'none' }}>
+              overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', userSelect:'none',
+              color: isActive ? 'var(--accent-text)' : 'var(--text)' }}>
             {node.title}
           </span>
         )}
@@ -155,6 +206,9 @@ export default function SidebarItem({ node, depth, currentPageId, autoEdit, onNa
                 border:'1px solid var(--border)', borderRadius:10, boxShadow:'var(--shadow-lg)', minWidth:160, padding:4 }}>
                 <button onClick={() => { setEditing(true); setMenu(false) }} style={menuBtnStyle}>✏️ 이름 변경</button>
                 <button onClick={() => { setMenu(false); setEmojiPicker(true) }} style={menuBtnStyle}>😀 이모지 변경</button>
+                {!isFolder && onMove && (
+                  <button onClick={() => { setMenu(false); setMovePicker(true) }} style={menuBtnStyle}>📁 폴더로 이동</button>
+                )}
                 {!isFolder && onDuplicate && (
                   <button onClick={() => { onDuplicate(node.id); setMenu(false) }} style={menuBtnStyle}>📋 복제</button>
                 )}
@@ -169,14 +223,46 @@ export default function SidebarItem({ node, depth, currentPageId, autoEdit, onNa
         </div>
       </div>
 
+      {/* Move to folder picker */}
+      {movePicker && (
+        <>
+          <div style={{ position:'fixed', inset:0, zIndex:59 }} onClick={() => setMovePicker(false)} />
+          <div style={{ position:'fixed', left:'260px', top:'50%', transform:'translateY(-50%)', zIndex:60,
+            background:'var(--bg)', border:'1px solid var(--border)', borderRadius:12,
+            boxShadow:'var(--shadow-lg)', minWidth:200, padding:8 }}>
+            <div style={{ fontSize:'0.72rem', fontWeight:700, color:'var(--text-faint)',
+              textTransform:'uppercase', letterSpacing:'.06em', padding:'4px 8px 8px' }}>폴더로 이동</div>
+            {node.parentId !== null && (
+              <button onClick={() => { onMove?.(node.id, null); setMovePicker(false) }} style={menuBtnStyle}>
+                🏠 루트로 이동
+              </button>
+            )}
+            {folders.map(f => (
+              <button key={f.id}
+                onClick={() => { onMove?.(node.id, f.id); setMovePicker(false) }}
+                style={{ ...menuBtnStyle, fontWeight: f.id === node.parentId ? 700 : 400 }}>
+                {f.emoji || '📁'} {f.title}
+                {f.id === node.parentId && <span style={{ color:'var(--text-faint)', fontSize:'0.72rem', marginLeft:4 }}>(현재)</span>}
+              </button>
+            ))}
+            {folders.length === 0 && node.parentId === null && (
+              <div style={{ padding:'8px 12px', fontSize:'0.82rem', color:'var(--text-faint)' }}>
+                폴더가 없어요
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
       {/* Children */}
       {open && node.children.length > 0 && (
         <div>
           {node.children.map(child => (
             <SidebarItem key={child.id} node={child} depth={depth+1}
-              currentPageId={currentPageId} onNavigate={onNavigate}
+              currentPageId={currentPageId} allPages={allPages}
+              onNavigate={onNavigate}
               onAddChild={onAddChild} onDelete={onDelete} onRename={onRename}
-              onEmojiChange={onEmojiChange} onDuplicate={onDuplicate} />
+              onEmojiChange={onEmojiChange} onDuplicate={onDuplicate} onMove={onMove} />
           ))}
         </div>
       )}

@@ -79,6 +79,16 @@ export function duplicatePage(workspaceId: string, id: string): Page {
   })
 }
 
+export function movePage(workspaceId: string, id: string, newParentId: string | null): void {
+  const pages = getPages(workspaceId)
+  const siblings = pages.filter(p => p.parentId === newParentId)
+  const maxOrder = siblings.length > 0 ? Math.max(...siblings.map(p => p.order)) : -1
+  const updated = pages.map(p =>
+    p.id === id ? { ...p, parentId: newParentId, order: maxOrder + 1, updatedAt: new Date().toISOString() } : p
+  )
+  save(workspaceId, updated)
+}
+
 export function reorderPages(workspaceId: string, updated: Page[]): void {
   const pages = getPages(workspaceId)
   const map = new Map(updated.map(p => [p.id, p]))

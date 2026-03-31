@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { getPages, createPage, updatePage, deletePage, reorderPages, duplicatePage, buildTree, type Page, type PageTreeNode } from '@/lib/localStorage/pages'
+import { getPages, createPage, updatePage, deletePage, reorderPages, duplicatePage, movePage, buildTree, type Page, type PageTreeNode } from '@/lib/localStorage/pages'
 
 export function usePages(workspaceId: string) {
   const [pages, setPages] = useState<Page[]>([])
@@ -30,5 +30,6 @@ export function usePages(workspaceId: string) {
     deletePage: (id: string) => { deletePage(workspaceId, id); refresh() },
     duplicatePage: (id: string) => { const p = duplicatePage(workspaceId, id); refresh(); return p },
     reorderPages: (updated: Page[]) => { reorderPages(workspaceId, updated); refresh() },
+    movePage: (id: string, newParentId: string | null) => { movePage(workspaceId, id, newParentId); refresh() },
   }
 }
