@@ -1074,6 +1074,9 @@ function renderEditor() {
           <button class="tb-btn" title="이미지 삽입" onclick="triggerImageUpload()">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
           </button>
+          <button class="tb-btn tb-btn-gif" title="GIF 삽입" onclick="openGifPicker()">
+            <span style="font-size:.7rem;font-weight:700;letter-spacing:-.5px">GIF</span>
+          </button>
           <button class="tb-btn" title="코드 블록" onclick="insertCodeBlock()">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
           </button>
@@ -1141,6 +1144,49 @@ function renderEditor() {
         <div class="modal-actions">
           <button class="btn btn-secondary" onclick="closeLinkModal()">취소</button>
           <button class="btn btn-primary" onclick="insertLink()">삽입</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GIF Picker Modal -->
+    <div class="modal-overlay" id="gifModal">
+      <div class="modal gif-modal">
+        <div class="gif-modal-header">
+          <h3>GIF 삽입</h3>
+          <button class="gif-modal-close" onclick="closeGifPicker()">✕</button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="gif-tabs">
+          <button class="gif-tab active" data-tab="url" onclick="switchGifTab('url', this)">URL 붙여넣기</button>
+          <button class="gif-tab" data-tab="upload" onclick="switchGifTab('upload', this)">파일 업로드</button>
+        </div>
+
+        <!-- URL Tab -->
+        <div class="gif-tab-content" id="gifTab-url">
+          <p style="font-size:.82rem;color:var(--text-muted);margin:0 0 8px">Giphy나 Tenor에서 GIF를 찾아 링크를 복사해서 붙여넣으세요.</p>
+          <div class="gif-shortcut-links">
+            <a href="https://giphy.com/search/developer-coding" target="_blank" rel="noopener" class="gif-shortcut-btn">💻 개발자 GIF 찾기</a>
+            <a href="https://giphy.com/search/office-worker" target="_blank" rel="noopener" class="gif-shortcut-btn">😩 직장인 GIF 찾기</a>
+            <a href="https://giphy.com/search/bug-programming" target="_blank" rel="noopener" class="gif-shortcut-btn">🐛 버그 GIF 찾기</a>
+            <a href="https://giphy.com/search/overtime-work" target="_blank" rel="noopener" class="gif-shortcut-btn">🌙 야근 GIF 찾기</a>
+          </div>
+          <label style="font-size:.82rem;font-weight:600;color:var(--text-muted);display:block;margin:14px 0 6px">GIF 링크 붙여넣기</label>
+          <input type="text" id="gifUrlInput" placeholder="https://media.giphy.com/media/...gif" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:7px;background:var(--bg-secondary);color:var(--text);font-size:.9rem;margin-bottom:12px;box-sizing:border-box" />
+          <div id="gifUrlPreview" style="min-height:80px;display:flex;align-items:center;justify-content:center;background:var(--bg-tertiary);border-radius:8px;margin-bottom:14px;overflow:hidden">
+            <span style="color:var(--text-faint);font-size:.85rem">미리보기</span>
+          </div>
+          <button class="btn btn-primary" style="width:100%" onclick="insertGifFromUrl()">문서에 삽입</button>
+        </div>
+
+        <!-- Upload Tab -->
+        <div class="gif-tab-content" id="gifTab-upload" style="display:none">
+          <div class="gif-upload-zone" id="gifUploadZone" onclick="document.getElementById('gifFileInput').click()">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text-faint);margin-bottom:10px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <p style="font-weight:600;margin-bottom:4px">GIF 파일을 여기에 드롭하거나 클릭하세요</p>
+            <p style="font-size:.82rem;color:var(--text-faint)">.gif 파일만 지원됩니다</p>
+          </div>
+          <input type="file" id="gifFileInput" accept="image/gif" style="display:none" />
         </div>
       </div>
     </div>
@@ -1360,6 +1406,124 @@ window.publishDocument = publishDocument;
 document.addEventListener('click', (e) => {
   const modal = document.getElementById('linkModal');
   if (modal && e.target === modal) closeLinkModal();
+  const gifModal = document.getElementById('gifModal');
+  if (gifModal && e.target === gifModal) closeGifPicker();
+});
+
+// ========== GIF PICKER ==========
+function openGifPicker() {
+  const editor = document.getElementById('editorContent');
+  if (editor) {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) savedRange = sel.getRangeAt(0).cloneRange();
+  }
+  const modal = document.getElementById('gifModal');
+  if (!modal) return;
+  modal.classList.add('open');
+}
+window.openGifPicker = openGifPicker;
+
+function closeGifPicker() {
+  const modal = document.getElementById('gifModal');
+  if (modal) modal.classList.remove('open');
+}
+window.closeGifPicker = closeGifPicker;
+
+function switchGifTab(tab, btn) {
+  document.querySelectorAll('.gif-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.gif-tab-content').forEach(el => el.style.display = 'none');
+  const content = document.getElementById('gifTab-' + tab);
+  if (content) content.style.display = 'block';
+}
+window.switchGifTab = switchGifTab;
+
+function insertGifUrl(url) {
+  closeGifPicker();
+  const editor = document.getElementById('editorContent');
+  if (!editor) return;
+  editor.focus();
+
+  const img = document.createElement('img');
+  img.src = url;
+  img.alt = 'gif';
+  img.style.maxWidth = '100%';
+  img.style.borderRadius = '8px';
+
+  if (savedRange) {
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(savedRange);
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+    range.insertNode(img);
+    range.setStartAfter(img);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } else {
+    editor.appendChild(img);
+  }
+}
+window.insertGifUrl = insertGifUrl;
+
+function insertGifFromUrl() {
+  const input = document.getElementById('gifUrlInput');
+  if (!input || !input.value.trim()) return;
+  insertGifUrl(input.value.trim());
+  input.value = '';
+  const preview = document.getElementById('gifUrlPreview');
+  if (preview) preview.innerHTML = '<span style="color:var(--text-faint);font-size:.85rem">미리보기</span>';
+}
+window.insertGifFromUrl = insertGifFromUrl;
+
+// GIF URL tab: live preview
+document.addEventListener('input', (e) => {
+  if (e.target.id !== 'gifUrlInput') return;
+  const val = e.target.value.trim();
+  const preview = document.getElementById('gifUrlPreview');
+  if (!preview) return;
+  if (val && (val.endsWith('.gif') || val.includes('giphy') || val.includes('tenor'))) {
+    preview.innerHTML = `<img src="${val}" alt="preview" style="max-height:160px;border-radius:6px" onerror="this.parentElement.innerHTML='<span style=color:var(--danger-border)>URL을 불러올 수 없습니다</span>'" />`;
+  } else {
+    preview.innerHTML = '<span style="color:var(--text-faint);font-size:.85rem">미리보기</span>';
+  }
+});
+
+// GIF file upload zone
+document.addEventListener('change', (e) => {
+  if (e.target.id !== 'gifFileInput') return;
+  const file = e.target.files[0];
+  if (file && file.type === 'image/gif') {
+    insertImageFile(file);
+    closeGifPicker();
+  }
+  e.target.value = '';
+});
+
+// GIF upload drag & drop
+document.addEventListener('dragover', (e) => {
+  if (document.getElementById('gifTab-upload')?.style.display !== 'none') {
+    const zone = document.getElementById('gifUploadZone');
+    if (zone && zone.contains(e.target)) { e.preventDefault(); zone.classList.add('dragover'); }
+  }
+});
+document.addEventListener('dragleave', (e) => {
+  const zone = document.getElementById('gifUploadZone');
+  if (zone && !zone.contains(e.relatedTarget)) zone.classList.remove('dragover');
+});
+document.addEventListener('drop', (e) => {
+  const zone = document.getElementById('gifUploadZone');
+  if (!zone || !zone.contains(e.target)) return;
+  e.preventDefault();
+  zone.classList.remove('dragover');
+  const file = [...e.dataTransfer.files].find(f => f.type === 'image/gif');
+  if (file) { insertImageFile(file); closeGifPicker(); }
+});
+
+// GIF search on Enter key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && e.target.id === 'gifSearchInput') searchGifs();
 });
 
 // ========== INIT ==========

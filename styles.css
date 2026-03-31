@@ -955,6 +955,103 @@ a:hover { text-decoration: underline; }
 .modal input:focus { border-color: var(--accent); }
 .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
 
+/* ---- GIF PICKER ---- */
+.tb-btn-gif {
+  background: linear-gradient(135deg, #f97316, #ec4899);
+  color: white !important;
+  border-radius: 5px;
+  min-width: 34px;
+}
+.tb-btn-gif:hover { opacity: .85; }
+
+.gif-modal {
+  width: 600px;
+  max-width: calc(100vw - 40px);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow: hidden;
+}
+.gif-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.gif-modal-header h3 { margin: 0; font-size: 1rem; font-weight: 700; }
+.gif-modal-close {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-muted); font-size: 1rem; padding: 4px 6px;
+  border-radius: 6px; line-height: 1;
+}
+.gif-modal-close:hover { background: var(--bg-tertiary); color: var(--text); }
+
+.gif-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
+}
+.gif-tab {
+  background: none; border: none; cursor: pointer;
+  padding: 7px 14px; font-size: .85rem; font-weight: 500;
+  color: var(--text-muted); border-bottom: 2px solid transparent;
+  margin-bottom: -1px; border-radius: 0; transition: color .15s;
+}
+.gif-tab:hover { color: var(--text); }
+.gif-tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+
+.gif-tab-content { display: flex; flex-direction: column; overflow: hidden; }
+
+.gif-search-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.gif-search-input {
+  flex: 1; padding: 9px 12px;
+  border: 1px solid var(--border); border-radius: 7px;
+  background: var(--bg-secondary); color: var(--text); font-size: .9rem;
+  transition: border-color .2s;
+}
+.gif-search-input:focus { outline: none; border-color: var(--accent); }
+.gif-search-btn { white-space: nowrap; }
+
+.gif-categories {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;
+}
+.gif-cat-btn {
+  background: var(--bg-tertiary); border: 1px solid var(--border);
+  border-radius: 20px; padding: 4px 12px;
+  font-size: .8rem; cursor: pointer; color: var(--text);
+  transition: background .15s, border-color .15s;
+}
+.gif-cat-btn:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent-text); }
+
+.gif-shortcut-links {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.gif-shortcut-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 12px; border-radius: 20px;
+  background: var(--bg-tertiary); border: 1px solid var(--border);
+  color: var(--text); font-size: .8rem; text-decoration: none;
+  transition: background .15s, border-color .15s;
+}
+.gif-shortcut-btn:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent-text); }
+
+.gif-upload-zone {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  border: 2px dashed var(--border); border-radius: 12px;
+  padding: 48px 24px; cursor: pointer;
+  transition: border-color .2s, background .2s;
+  text-align: center;
+}
+.gif-upload-zone:hover,
+.gif-upload-zone.dragover {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+.gif-upload-zone p { margin: 0; color: var(--text-muted); }
+
 /* ---- RESPONSIVE ---- */
 @media (max-width: 1200px) {
   .toc-sidebar { display: none; }
