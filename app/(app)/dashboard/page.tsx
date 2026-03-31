@@ -173,10 +173,13 @@ export default function DashboardPage() {
           /* EMPTY STATE */
           <div style={{ textAlign:'center', padding:'80px 24px', borderRadius:20,
             background:'var(--bg-secondary)', border:'2px dashed var(--border)' }}>
-            <img src="/logo.png" alt="BlackCatBook" style={{ width:80, height:80, objectFit:'contain', marginBottom:0 }} />
+            <img src="/logo.png" alt="BlackCatBook" style={{ width:160, height:160, objectFit:'contain', display:'block', margin:'0 auto 20px' }} />
             <h2 style={{ color:'var(--text)', fontWeight:800, fontSize:'1.3rem', marginBottom:8 }}>첫 워크스페이스를 만들어보세요</h2>
-            <p style={{ color:'var(--text-muted)', fontSize:'0.9rem', marginBottom:28 }}>
+            <p style={{ color:'var(--text-muted)', fontSize:'0.9rem', marginBottom:8 }}>
               기술 문서, 블로그, 포트폴리오 — 무엇이든 자유롭게
+            </p>
+            <p style={{ color:'var(--text-faint)', fontSize:'0.82rem', marginBottom:28 }}>
+              로그인 없이도 무료로 사용할 수 있어요 —<br />데이터는 이 기기에 저장됩니다
             </p>
             <button onClick={() => setModal(true)}
               style={{ padding:'12px 28px', borderRadius:12, background:'var(--accent)',

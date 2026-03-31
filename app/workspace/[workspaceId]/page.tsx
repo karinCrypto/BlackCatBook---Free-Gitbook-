@@ -186,7 +186,7 @@ export default function WorkspacePage() {
           <span style={{ display:'block', width:18, height:2, background:'currentColor', borderRadius:2 }}/>
         </button>
 
-        <button onClick={() => router.push('/dashboard')}
+        <button onClick={() => window.location.reload()}
           style={{ display:'flex', alignItems:'center', gap:6,
             background:'none', border:'none', cursor:'pointer', padding:0 }}>
           <img src="/logo.png" alt="BlackCatBook" style={{ width:28, height:28, objectFit:'contain' }} />
