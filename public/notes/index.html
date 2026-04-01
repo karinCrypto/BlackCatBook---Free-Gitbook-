@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="glacier">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>BlackCatBook</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#3b82f6" id="themeColorMeta" />
+
+  <!-- iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="BCBook" />
+
+  <!-- Android -->
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!-- SEO -->
+  <meta name="description" content="문서 편집, 꿈 노트, 감사 일기, PDF 도서관 — 오프라인에서도 동작하는 노트 앱" />
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<!-- ======= THEME SWITCHER PANEL ======= -->
+<div class="theme-panel" id="themePanel">
+  <button class="theme-panel-toggle" id="themePanelToggle" aria-label="테마 변경">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M5.34 18.66l-1.41 1.41M2 12H4M20 12h2M19.07 19.07l-1.41-1.41M5.34 5.34L3.93 3.93M12 2v2M12 20v2"/>
+    </svg>
+  </button>
+  <div class="theme-options" id="themeOptions">
+    <p class="theme-label">테마 선택</p>
+    <button class="theme-btn active" data-theme="glacier" title="Glacier">
+      <span class="swatch" style="background: linear-gradient(135deg,#fff 50%,#3b82f6 50%)"></span>
+      <span>Glacier</span>
+    </button>
+    <button class="theme-btn" data-theme="midnight" title="Midnight">
+      <span class="swatch" style="background: linear-gradient(135deg,#1e293b 50%,#818cf8 50%)"></span>
+      <span>Midnight</span>
+    </button>
+    <button class="theme-btn" data-theme="forest" title="Forest">
+      <span class="swatch" style="background: linear-gradient(135deg,#f0fdf4 50%,#16a34a 50%)"></span>
+      <span>Forest</span>
+    </button>
+    <button class="theme-btn" data-theme="sakura" title="Sakura">
+      <span class="swatch" style="background: linear-gradient(135deg,#fff7f7 50%,#f43f5e 50%)"></span>
+      <span>Sakura</span>
+    </button>
+    <button class="theme-btn" data-theme="slate" title="Slate">
+      <span class="swatch" style="background: linear-gradient(135deg,#f8fafc 50%,#475569 50%)"></span>
+      <span>Slate</span>
+    </button>
+    <button class="theme-btn" data-theme="custom" title="Custom" id="customThemeBtn">
+      <span class="swatch" style="background: conic-gradient(#f43f5e,#f97316,#3b82f6,#16a34a,#f43f5e)"></span>
+      <span>커스텀</span>
+    </button>
+    <!-- Custom color pickers -->
+    <div class="custom-theme-panel" id="customThemePanel" style="display:none">
+      <div class="custom-color-row">
+        <label>배경</label>
+        <input type="color" id="cp-bg" value="#ffffff" />
+      </div>
+      <div class="custom-color-row">
+        <label>사이드바</label>
+        <input type="color" id="cp-sidebar" value="#f8fafc" />
+      </div>
+      <div class="custom-color-row">
+        <label>강조색</label>
+        <input type="color" id="cp-accent" value="#3b82f6" />
+      </div>
+      <div class="custom-color-row">
+        <label>텍스트</label>
+        <input type="color" id="cp-text" value="#1e293b" />
+      </div>
+      <div class="custom-color-row">
+        <label>테두리</label>
+        <input type="color" id="cp-border" value="#e2e8f0" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= HEADER ======= -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-left">
+      <a href="/dashboard" class="dashboard-back-btn" title="대시보드로">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        대시보드
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+      <button class="back-btn" id="backBtn" title="뒤로가기" aria-label="뒤로가기" style="display:none">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <a href="#" class="site-logo" data-page="home">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <rect width="28" height="28" rx="8" fill="var(--accent)"/>
+          <text x="14" y="20" text-anchor="middle" font-size="16" fill="white">🐱</text>
+        </svg>
+        <span class="site-name">BlackCatBook</span>
+        <span class="site-version">v2.0</span>
+      </a>
+    </div>
+    <div class="header-center">
+      <div class="search-box">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" id="searchInput" placeholder="문서 검색..." autocomplete="off" />
+        <kbd>⌘K</kbd>
+      </div>
+    </div>
+    <div class="header-right">
+      <!-- Mobile search button (visible only on mobile) -->
+      <button class="header-icon-btn mobile-search-btn" id="mobileSearchBtn" aria-label="검색">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </button>
+      <!-- Lecture/Draw mode toggle -->
+      <button class="header-icon-btn" id="drawModeBtn" title="강의 드로잉 모드" aria-label="드로잉 모드">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      </button>
+      <a href="https://github.com" class="header-link github-link" target="_blank" rel="noopener">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+      </a>
+      <!-- Login button -->
+      <button class="login-btn" id="loginBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span id="loginBtnText">로그인</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ======= MOBILE SEARCH BAR ======= -->
+<div class="mobile-search-bar" id="mobileSearchBar">
+  <div class="mobile-search-inner">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-faint);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="mobileSearchInput" placeholder="검색..." autocomplete="off" />
+    <button id="mobileSearchClose" aria-label="검색 닫기">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ======= SEARCH RESULTS OVERLAY ======= -->
+<div class="search-overlay" id="searchOverlay">
+  <div class="search-results" id="searchResults"></div>
+</div>
+
+<!-- ======= SIDEBAR OVERLAY (mobile) ======= -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ======= MAIN LAYOUT ======= -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <nav class="sidebar-nav">
+
+      <div class="nav-group">
+        <div class="nav-group-label">시작하기</div>
+        <ul>
+          <li><a href="#" class="nav-link active" data-page="home">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            홈
+          </a></li>
+          <li><a href="#" class="nav-link" data-page="introduction">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            소개
+          </a></li>
+          <li><a href="#" class="nav-link" data-page="quickstart">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            빠른 시작
+          </a></li>
+          <li><a href="#" class="nav-link" data-page="installation">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            설치
+          </a></li>
+        </ul>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-label">가이드</div>
+        <ul>
+          <li class="has-children">
+            <a href="#" class="nav-link nav-parent" data-page="core-concepts">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              핵심 개념
+              <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </a>
+            <ul class="sub-nav">
+              <li><a href="#" class="nav-link sub-link" data-page="time-tracking">시간 추적</a></li>
+              <li><a href="#" class="nav-link sub-link" data-page="projects">프로젝트 관리</a></li>
+              <li><a href="#" class="nav-link sub-link" data-page="reports">보고서</a></li>
+            </ul>
+          </li>
+          <li><a href="#" class="nav-link" data-page="configuration">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M5.34 18.66l-1.41 1.41M2 12H4M20 12h2M19.07 19.07l-1.41-1.41M5.34 5.34L3.93 3.93M12 2v2M12 20v2"/></svg>
+            설정
+          </a></li>
+          <li><a href="#" class="nav-link" data-page="integrations">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            통합
+          </a></li>
+        </ul>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-label">API 레퍼런스</div>
+        <ul>
+          <li><a href="#" class="nav-link" data-page="api-overview">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            API 개요
+          </a></li>
+          <li><a href="#" class="nav-link" data-page="authentication">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            인증
+          </a></li>
+          <li><a href="#" class="nav-link" data-page="endpoints">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            엔드포인트
+          </a></li>
+          <li><a href="#" class="nav-link" data-page="webhooks">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+            웹훅
+          </a></li>
+        </ul>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-label">리소스</div>
+        <ul>
+          <li><a href="#" class="nav-link" data-page="changelog">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            변경 로그
+          </a></li>
+          <li><a href="#" class="nav-link" data-page="faq">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            자주 묻는 질문
+          </a></li>
+        </ul>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-label">노트 템플릿</div>
+        <ul>
+          <li><a href="#" class="nav-link" data-page="dream-note">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            꿈 노트
+          </a></li>
+          <li><a href="#" class="nav-link" data-page="gratitude-journal">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            감사 일기
+          </a></li>
+          <li><a href="#" class="nav-link" data-page="pdf-library">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            PDF 도서관
+          </a></li>
+        </ul>
+      </div>
+
+    </nav>
+  </aside>
+
+  <!-- CONTENT AREA -->
+  <main class="content-area" id="contentArea">
+    <div class="content-inner" id="contentInner">
+      <!-- Dynamic content rendered here -->
+    </div>
+
+    <!-- PAGE NAVIGATION -->
+    <nav class="page-nav" id="pageNav">
+      <a href="#" class="page-nav-btn prev" id="prevBtn" style="display:none">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        <span>
+          <small>이전</small>
+          <strong id="prevTitle"></strong>
+        </span>
+      </a>
+      <a href="#" class="page-nav-btn next" id="nextBtn" style="display:none">
+        <span>
+          <small>다음</small>
+          <strong id="nextTitle"></strong>
+        </span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+    </nav>
+  </main>
+
+  <!-- TABLE OF CONTENTS (right sidebar) -->
+  <aside class="toc-sidebar" id="tocSidebar">
+    <div class="toc-inner">
+      <p class="toc-title">이 페이지에서</p>
+      <ul class="toc-list" id="tocList"></ul>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ======= MOBILE BOTTOM NAV ======= -->
+<nav class="mobile-bottom-nav" id="mobileBottomNav">
+  <button class="mbn-btn active" data-tab="home" onclick="mobileNavTo('home')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>홈</span>
+  </button>
+  <button class="mbn-btn" data-tab="search" onclick="mobileNavSearch()">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <span>검색</span>
+  </button>
+  <button class="mbn-btn" data-tab="editor" onclick="mobileNavTo('editor')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    <span>편집기</span>
+  </button>
+  <button class="mbn-btn" data-tab="dream-note" onclick="mobileNavTo('dream-note')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <span>노트</span>
+  </button>
+  <button class="mbn-btn" data-tab="menu" id="mbnMenuBtn" onclick="mobileNavMenu()">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    <span>메뉴</span>
+  </button>
+</nav>
+
+<!-- ======= FOOTER ======= -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>© 2026 BlackCatBook. All rights reserved.</span>
+    <span class="footer-links">
+      <a href="#">개인정보처리방침</a>
+      <a href="#">이용약관</a>
+      <a href="#">지원</a>
+    </span>
+  </div>
+</footer>
+
+<!-- ======= LOGIN MODAL ======= -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <h3 id="loginModalTitle">로그인</h3>
+    <div id="loginForm">
+      <label>이름 / 닉네임</label>
+      <input type="text" id="loginName" placeholder="이름을 입력하세요" />
+      <label>이메일</label>
+      <input type="text" id="loginEmail" placeholder="your@email.com" />
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeLoginModal()">취소</button>
+        <button class="btn btn-primary" onclick="submitLogin()">시작하기</button>
+      </div>
+    </div>
+    <div id="logoutForm" style="display:none">
+      <p style="margin-bottom:16px;color:var(--text-muted);font-size:.9rem">현재 로그인: <strong id="loggedInName"></strong></p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeLoginModal()">닫기</button>
+        <button class="btn btn-danger" onclick="submitLogout()">로그아웃</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= AI SUMMARY MODAL ======= -->
+<div class="modal-overlay" id="aiModal">
+  <div class="modal ai-modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 style="margin:0">✨ AI 요약</h3>
+      <button style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1rem;padding:4px 6px;border-radius:6px" onclick="closeAiModal()">✕</button>
+    </div>
+    <div id="aiSummaryContent" style="font-size:.9rem;color:var(--text);line-height:1.7"></div>
+    <div class="modal-actions" style="margin-top:16px">
+      <button class="btn btn-secondary" onclick="closeAiModal()">닫기</button>
+      <button class="btn btn-primary" onclick="copyAiSummary()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        복사
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= DRAWING CANVAS OVERLAY ======= -->
+<canvas id="drawCanvas" style="display:none;position:fixed;inset:0;z-index:500;cursor:crosshair;touch-action:none"></canvas>
+
+<!-- Drawing Toolbar -->
+<div class="draw-toolbar" id="drawToolbar" style="display:none">
+  <button class="draw-tool-btn active" id="dtPen" title="펜" onclick="setDrawTool('pen')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+  </button>
+  <button class="draw-tool-btn" id="dtHighlight" title="형광펜" onclick="setDrawTool('highlight')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 11-6 6v3h3l6-6"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>
+  </button>
+  <button class="draw-tool-btn" id="dtEraser" title="지우개" onclick="setDrawTool('eraser')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m20 20-6.03-6.03"/><path d="M9 10.5 4 15.5 7.5 19h5l3-3"/><path d="m17 2-9.5 9.5"/></svg>
+  </button>
+  <div class="draw-divider"></div>
+  <input type="color" id="drawColor" value="#e11d48" title="색상" class="draw-color-input" />
+  <div class="draw-divider"></div>
+  <input type="range" id="drawSize" min="1" max="40" value="4" title="크기" class="draw-size-slider" />
+  <div class="draw-divider"></div>
+  <button class="draw-tool-btn" id="dtClear" title="전체 지우기" onclick="clearCanvas()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+  </button>
+  <button class="draw-tool-btn" style="color:var(--danger-border)" title="드로잉 종료" onclick="exitDrawMode()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

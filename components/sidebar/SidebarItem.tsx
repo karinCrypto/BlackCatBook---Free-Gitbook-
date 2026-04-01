@@ -1,6 +1,7 @@
 'use client'
 import { useState, useRef } from 'react'
 import type { Page, PageTreeNode } from '@/lib/localStorage/pages'
+import { useT } from '@/lib/i18n'
 
 const PAGE_EMOJIS = [
   '📄','📝','📖','📚','📋','📌','📍','🗒️','🗂️','📁',
@@ -25,6 +26,7 @@ type Props = {
 }
 
 export default function SidebarItem({ node, depth, currentPageId, autoEdit, allPages, onNavigate, onAddChild, onDelete, onRename, onEmojiChange, onDuplicate, onMove }: Props) {
+  const tr = useT()
   const [open, setOpen] = useState(true)
   const [editing, setEditing] = useState(autoEdit ?? false)
   const [title, setTitle] = useState(node.title)
@@ -40,13 +42,11 @@ export default function SidebarItem({ node, depth, currentPageId, autoEdit, allP
     else setTitle(node.title)
   }
 
-  // Drag source handlers
   function handleDragStart(e: React.DragEvent) {
     e.dataTransfer.setData('text/plain', node.id)
     e.dataTransfer.effectAllowed = 'move'
   }
 
-  // Drop target handlers (folders only)
   function handleDragOver(e: React.DragEvent) {
     if (node.type !== 'folder') return
     e.preventDefault()
@@ -64,13 +64,11 @@ export default function SidebarItem({ node, depth, currentPageId, autoEdit, allP
     if (node.type !== 'folder') return
     const draggedId = e.dataTransfer.getData('text/plain')
     if (!draggedId || draggedId === node.id) return
-    // Prevent dropping a folder into its own descendant
     if (isDescendant(draggedId, node.id)) return
     onMove?.(draggedId, node.id)
     setOpen(true)
   }
 
-  // Check if potentialAncestor is a descendant of id (would create a cycle)
   function isDescendant(ancestorId: string, nodeId: string): boolean {
     const children = allPages.filter(p => p.parentId === nodeId)
     return children.some(c => c.id === ancestorId || isDescendant(ancestorId, c.id))
@@ -80,7 +78,6 @@ export default function SidebarItem({ node, depth, currentPageId, autoEdit, allP
   const isFolder = node.type === 'folder'
   const emoji = node.emoji
 
-  // Folders available to move into (excluding self and descendants)
   const folders = allPages.filter(p =>
     p.type === 'folder' &&
     p.id !== node.id &&
@@ -104,11 +101,10 @@ export default function SidebarItem({ node, depth, currentPageId, autoEdit, allP
         onMouseEnter={e => { if(!isActive && !dragOver)(e.currentTarget as HTMLElement).style.background='var(--bg-tertiary)' }}
         onMouseLeave={e => { if(!isActive && !dragOver)(e.currentTarget as HTMLElement).style.background='transparent' }}>
 
-        {/* Emoji or default icon */}
         <div style={{ position:'relative', flexShrink:0 }}>
           <button
             onClick={e => { e.stopPropagation(); setEmojiPicker(p => !p) }}
-            title="이모지 변경"
+            title={tr('sidebar.menu.emoji')}
             style={{ background:'none', border:'none', cursor:'pointer', padding:0, lineHeight:1,
               display:'flex', alignItems:'center', justifyContent:'center',
               width:18, height:18, fontSize: emoji ? 14 : 12, borderRadius:4 }}>
@@ -126,7 +122,6 @@ export default function SidebarItem({ node, depth, currentPageId, autoEdit, allP
             )}
           </button>
 
-          {/* Emoji picker */}
           {emojiPicker && (
             <>
               <div style={{ position:'fixed', inset:0, zIndex:59 }} onClick={() => setEmojiPicker(false)} />
@@ -134,7 +129,7 @@ export default function SidebarItem({ node, depth, currentPageId, autoEdit, allP
                 background:'var(--bg)', border:'1px solid var(--border)', borderRadius:12,
                 padding:10, boxShadow:'var(--shadow-lg)', width:220 }}>
                 <div style={{ fontSize:'0.68rem', fontWeight:700, color:'var(--text-faint)',
-                  textTransform:'uppercase', letterSpacing:'.06em', marginBottom:8 }}>이모지 선택</div>
+                  textTransform:'uppercase', letterSpacing:'.06em', marginBottom:8 }}>{tr('sidebar.emoji.title')}</div>
                 <div style={{ display:'flex', flexWrap:'wrap', gap:3, marginBottom:8 }}>
                   {PAGE_EMOJIS.map(em => (
                     <button key={em}
@@ -153,7 +148,7 @@ export default function SidebarItem({ node, depth, currentPageId, autoEdit, allP
                     style={{ width:'100%', padding:'5px', borderRadius:7, border:'1px solid var(--border)',
                       background:'transparent', color:'var(--text-faint)', cursor:'pointer',
                       fontSize:'0.75rem', fontWeight:600 }}>
-                    이모지 제거
+                    {tr('sidebar.emoji.remove')}
                   </button>
                 )}
               </div>
@@ -161,7 +156,6 @@ export default function SidebarItem({ node, depth, currentPageId, autoEdit, allP
           )}
         </div>
 
-        {/* Folder chevron (when has emoji) */}
         {isFolder && emoji && (
           <button onClick={() => setOpen(o=>!o)} style={{ background:'none', border:'none', cursor:'pointer',
             color:'inherit', padding:0, display:'flex', alignItems:'center', flexShrink:0 }}>
@@ -172,7 +166,6 @@ export default function SidebarItem({ node, depth, currentPageId, autoEdit, allP
           </button>
         )}
 
-        {/* Title */}
         {editing ? (
           <input ref={inputRef} value={title} onChange={e=>setTitle(e.target.value)}
             onBlur={finishRename}
@@ -191,7 +184,6 @@ export default function SidebarItem({ node, depth, currentPageId, autoEdit, allP
           </span>
         )}
 
-        {/* Action menu */}
         <div style={{ position:'relative', marginLeft:'auto' }}>
           <button onClick={e => { e.stopPropagation(); setMenu(m=>!m) }}
             style={{ background:'none', border:'none', cursor:'pointer', color:'var(--text-faint)',
@@ -204,26 +196,25 @@ export default function SidebarItem({ node, depth, currentPageId, autoEdit, allP
               <div style={{ position:'fixed', inset:0, zIndex:49 }} onClick={() => setMenu(false)} />
               <div style={{ position:'absolute', right:0, top:'100%', zIndex:50, background:'var(--bg)',
                 border:'1px solid var(--border)', borderRadius:10, boxShadow:'var(--shadow-lg)', minWidth:160, padding:4 }}>
-                <button onClick={() => { setEditing(true); setMenu(false) }} style={menuBtnStyle}>✏️ 이름 변경</button>
-                <button onClick={() => { setMenu(false); setEmojiPicker(true) }} style={menuBtnStyle}>😀 이모지 변경</button>
+                <button onClick={() => { setEditing(true); setMenu(false) }} style={menuBtnStyle}>{tr('sidebar.menu.rename')}</button>
+                <button onClick={() => { setMenu(false); setEmojiPicker(true) }} style={menuBtnStyle}>{tr('sidebar.menu.emoji')}</button>
                 {!isFolder && onMove && (
-                  <button onClick={() => { setMenu(false); setMovePicker(true) }} style={menuBtnStyle}>📁 폴더로 이동</button>
+                  <button onClick={() => { setMenu(false); setMovePicker(true) }} style={menuBtnStyle}>{tr('sidebar.menu.move')}</button>
                 )}
                 {!isFolder && onDuplicate && (
-                  <button onClick={() => { onDuplicate(node.id); setMenu(false) }} style={menuBtnStyle}>📋 복제</button>
+                  <button onClick={() => { onDuplicate(node.id); setMenu(false) }} style={menuBtnStyle}>{tr('sidebar.menu.duplicate')}</button>
                 )}
-                {!isFolder && <button onClick={() => { onAddChild(node.id, 'page'); setMenu(false) }} style={menuBtnStyle}>📄 하위 페이지</button>}
-                <button onClick={() => { onAddChild(node.id, 'folder'); setMenu(false) }} style={menuBtnStyle}>📁 하위 폴더</button>
+                {!isFolder && <button onClick={() => { onAddChild(node.id, 'page'); setMenu(false) }} style={menuBtnStyle}>{tr('sidebar.menu.subpage')}</button>}
+                <button onClick={() => { onAddChild(node.id, 'folder'); setMenu(false) }} style={menuBtnStyle}>{tr('sidebar.menu.subfolder')}</button>
                 <div style={{ height:1, background:'var(--border)', margin:'4px 0' }} />
                 <button onClick={() => { onDelete(node.id); setMenu(false) }}
-                  style={{ ...menuBtnStyle, color:'#ef4444' }}>🗑️ 삭제</button>
+                  style={{ ...menuBtnStyle, color:'#ef4444' }}>{tr('sidebar.menu.delete')}</button>
               </div>
             </>
           )}
         </div>
       </div>
 
-      {/* Move to folder picker */}
       {movePicker && (
         <>
           <div style={{ position:'fixed', inset:0, zIndex:59 }} onClick={() => setMovePicker(false)} />
@@ -231,10 +222,10 @@ export default function SidebarItem({ node, depth, currentPageId, autoEdit, allP
             background:'var(--bg)', border:'1px solid var(--border)', borderRadius:12,
             boxShadow:'var(--shadow-lg)', minWidth:200, padding:8 }}>
             <div style={{ fontSize:'0.72rem', fontWeight:700, color:'var(--text-faint)',
-              textTransform:'uppercase', letterSpacing:'.06em', padding:'4px 8px 8px' }}>폴더로 이동</div>
+              textTransform:'uppercase', letterSpacing:'.06em', padding:'4px 8px 8px' }}>{tr('sidebar.move.title')}</div>
             {node.parentId !== null && (
               <button onClick={() => { onMove?.(node.id, null); setMovePicker(false) }} style={menuBtnStyle}>
-                🏠 루트로 이동
+                {tr('sidebar.move.root')}
               </button>
             )}
             {folders.map(f => (
@@ -242,19 +233,18 @@ export default function SidebarItem({ node, depth, currentPageId, autoEdit, allP
                 onClick={() => { onMove?.(node.id, f.id); setMovePicker(false) }}
                 style={{ ...menuBtnStyle, fontWeight: f.id === node.parentId ? 700 : 400 }}>
                 {f.emoji || '📁'} {f.title}
-                {f.id === node.parentId && <span style={{ color:'var(--text-faint)', fontSize:'0.72rem', marginLeft:4 }}>(현재)</span>}
+                {f.id === node.parentId && <span style={{ color:'var(--text-faint)', fontSize:'0.72rem', marginLeft:4 }}>{tr('sidebar.move.current')}</span>}
               </button>
             ))}
             {folders.length === 0 && node.parentId === null && (
               <div style={{ padding:'8px 12px', fontSize:'0.82rem', color:'var(--text-faint)' }}>
-                폴더가 없어요
+                {tr('sidebar.move.noFolders')}
               </div>
             )}
           </div>
         </>
       )}
 
-      {/* Children */}
       {open && node.children.length > 0 && (
         <div>
           {node.children.map(child => (
