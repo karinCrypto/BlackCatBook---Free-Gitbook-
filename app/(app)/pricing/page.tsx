@@ -15,7 +15,7 @@ const FREE_FEATURES = [
 const PREMIUM_FEATURES = [
   '워크스페이스 무제한',
   '문서 무제한',
-  'AI 글쓰기 도우미 우선 사용',
+  'AI 편집 · 글쓰기 도우미 (전용)',
   'PDF 라이브러리 무제한',
   '신기능 우선 체험',
 ]

@@ -1,6 +1,8 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { DOC_TYPES, TONES, transform, generateSeo, type DocType, type Tone } from '@/lib/freeFormat'
+import { usePlan } from '@/lib/firebase/premium'
 
 type Props = {
   onInsert: (html: string) => void
@@ -70,6 +72,8 @@ const PROVIDERS: { id: Provider; label: string; color: string; keyPrefix: string
 const STORAGE_PREFIX = 'bcb-ai-key-'
 
 export default function AIWritePanel({ onInsert, onClose }: Props) {
+  const { plan, loading: planLoading } = usePlan()
+  const router = useRouter()
   const [mode, setMode] = useState<'free' | 'api'>('free')
   const [freeText, setFreeText] = useState('')
   const [freeType, setFreeType] = useState<DocType>('blog')
@@ -181,6 +185,25 @@ export default function AIWritePanel({ onInsert, onClose }: Props) {
           style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 20, lineHeight: 1 }}>×</button>
       </div>
 
+      {/* 🔒 AI 편집은 프리미엄 전용 */}
+      {!planLoading && plan !== 'premium' && (
+        <div style={{ padding: '40px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, textAlign: 'center' }}>
+          <img src="/logo-black.png" alt="" style={{ width: 72, height: 72, borderRadius: 18, objectFit: 'cover' }} />
+          <div style={{ fontSize: '1.05rem', fontWeight: 900, color: 'var(--text)' }}>AI 편집은 프리미엄 전용이에요</div>
+          <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.7 }}>
+            글 붙여넣기 → 블로그·보고서·SNS 글로 즉시 변환<br />
+            SEO 메타태그 + GEO 키워드 자동 생성까지
+          </div>
+          <button onClick={() => router.push('/pricing')}
+            style={{ marginTop: 6, padding: '12px 28px', borderRadius: 12, border: 'none', cursor: 'pointer', background: '#f43f5e', color: 'white', fontWeight: 800, fontSize: '0.9rem' }}>
+            ₩4,900/월로 잠금 해제 →
+          </button>
+          <div style={{ fontSize: '0.72rem', color: 'var(--text-faint)' }}>언제든 해지 가능 · 구독 즉시 사용 가능</div>
+        </div>
+      )}
+
+      {!planLoading && plan === 'premium' && (
+      <>
       {/* 모드 탭: 무료 즉시 편집(기본) / API 모드 */}
       <div style={{ display: 'flex', gap: 6, padding: '12px 18px 0' }}>
         {([['free', '🆓 즉시 편집 (무료)'], ['api', '🔑 AI 생성 (API)']] as const).map(([m, label]) => (
@@ -468,6 +491,8 @@ export default function AIWritePanel({ onInsert, onClose }: Props) {
         </div>
 
       </div>
+      )}
+      </>
       )}
     </div>
   )
