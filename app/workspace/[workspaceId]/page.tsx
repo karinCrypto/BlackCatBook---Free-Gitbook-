@@ -253,7 +253,7 @@ export default function WorkspacePage() {
               cursor:'pointer', fontSize:'0.78rem', fontWeight:700, whiteSpace:'nowrap' }}>
             📑 템플릿
           </button>
-          <FontSizeControl />
+          <span className="md-show"><FontSizeControl /></span>
           {/* Export — desktop only */}
           <button onClick={handleExport} title="내보내기" className="md-show"
             style={{ background:'none', border:'none', cursor:'pointer', color:'var(--text-muted)', padding:6, borderRadius:6 }}>
@@ -373,16 +373,18 @@ export default function WorkspacePage() {
                 />
               </div>
               <div style={{ padding:'10px 12px', borderTop:'1px solid var(--border)', flexShrink:0 }}>
-                <button
-                  onClick={() => { setActiveView('pdf-library'); setMobileSidebar(false) }}
-                  style={{ display:'flex', alignItems:'center', gap:8, width:'100%',
-                    padding:'8px 10px', borderRadius:8, border:'none', cursor:'pointer',
-                    background: activeView === 'pdf-library' ? 'var(--accent-light)' : 'transparent',
-                    color: activeView === 'pdf-library' ? 'var(--accent-text)' : 'var(--text-muted)',
-                    fontSize:'0.85rem', fontWeight:600 }}>
-                  <span style={{ fontSize:'1rem' }}>📚</span>
-                  PDF 도서관
-                </button>
+                {([['pdf-library','📚','PDF 도서관'],['dream-note','🌙','꿈 노트'],['gratitude','🌿','감사 일기'],['drawing','🎨','드로잉']] as const).map(([id, icon, label]) => (
+                  <button key={id}
+                    onClick={() => { setActiveView(id); setMobileSidebar(false) }}
+                    style={{ display:'flex', alignItems:'center', gap:8, width:'100%',
+                      padding:'8px 10px', borderRadius:8, border:'none', cursor:'pointer',
+                      background: activeView === id ? 'var(--accent-light)' : 'transparent',
+                      color: activeView === id ? 'var(--accent-text)' : 'var(--text-muted)',
+                      fontSize:'0.85rem', fontWeight:600 }}>
+                    <span style={{ fontSize:'1rem' }}>{icon}</span>
+                    {label}
+                  </button>
+                ))}
               </div>
             </aside>
           </>

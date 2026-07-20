@@ -192,7 +192,7 @@ export default function AIWritePanel({ onInsert, onClose }: Props) {
           <div style={{ fontSize: '1.05rem', fontWeight: 900, color: 'var(--text)' }}>AI 편집은 프리미엄 전용이에요</div>
           <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.7 }}>
             글 붙여넣기 → 블로그·보고서·SNS 글로 즉시 변환<br />
-            SEO 키워드 자동 생성까지
+            SEO 키워드 생성까지
           </div>
           <button onClick={() => router.push('/pricing')}
             style={{ marginTop: 6, padding: '12px 28px', borderRadius: 12, border: 'none', cursor: 'pointer', background: '#f43f5e', color: 'white', fontWeight: 800, fontSize: '0.9rem' }}>
@@ -279,15 +279,15 @@ export default function AIWritePanel({ onInsert, onClose }: Props) {
               `<pre><code>${esc2(seo.metaHtml)}</code></pre>`,
               '<h2>🧩 JSON-LD 스키마</h2>',
               `<pre><code>${esc2(seo.jsonLd)}</code></pre>`,
-              '<h2>🎯 GEO 추천 키워드 (AI 검색 최적화)</h2>',
+              '<h2>🎯 추천 키워드</h2>',
               `<ul>${seo.geoKeywords.map(k => `<li>${esc2(k)}</li>`).join('')}</ul>`,
-              `<p>일반 키워드: ${seo.keywords.map(k => `#${esc2(k)}`).join(' ')}</p>`,
+              `<p>키워드 태그: ${seo.keywords.map(k => `#${esc2(k)}`).join(' ')}</p>`,
             ].join('\n'))
             setFreeMsg('✅ SEO/GEO 블록이 문서에 삽입됐어요!')
           }}
             style={{ padding: '11px', borderRadius: 10, cursor: 'pointer',
               background: 'var(--bg)', color: 'var(--text)', border: '1.5px solid var(--border)', fontWeight: 700, fontSize: '0.85rem' }}>
-            🔍 SEO 메타 + JSON-LD + GEO 키워드 생성
+            🔍 SEO 키워드 생성
           </button>
         </div>
       )}
