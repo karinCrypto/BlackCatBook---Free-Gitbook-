@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
+import { signInWithEmailAndPassword, signInWithPopup, sendPasswordResetEmail, RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult } from 'firebase/auth'
 import { auth, googleProvider, isFirebaseConfigured } from '@/lib/firebase/client'
 import { useT } from '@/lib/i18n'
 import LangSwitcher from '@/components/layout/LangSwitcher'
@@ -28,8 +28,61 @@ export default function LoginForm() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [resetMsg, setResetMsg] = useState('')
+  const [phone, setPhone] = useState('')
+  const [smsCode, setSmsCode] = useState('')
+  const [confirmRes, setConfirmRes] = useState<ConfirmationResult | null>(null)
+  const [phoneLoading, setPhoneLoading] = useState(false)
   const router = useRouter()
   const authReady = isFirebaseConfigured()
+
+  async function handleSendCode() {
+    setError(''); setResetMsg('')
+    const raw = phone.replace(/[^0-9+]/g, '')
+    if (!raw) { setError('휴대폰 번호를 입력해주세요. 예) 010-1234-5678'); return }
+    // 한국 번호를 국제형식(E.164)으로 변환
+    const e164 = raw.startsWith('+') ? raw : '+82' + raw.replace(/^0/, '')
+    setPhoneLoading(true)
+    try {
+      const w = window as unknown as { _bcbRecaptcha?: RecaptchaVerifier }
+      if (!w._bcbRecaptcha) {
+        w._bcbRecaptcha = new RecaptchaVerifier(auth, 'bcb-recaptcha', { size: 'invisible' })
+      }
+      const res = await signInWithPhoneNumber(auth, e164, w._bcbRecaptcha)
+      setConfirmRes(res)
+      setResetMsg('📱 인증번호를 문자로 보냈어요. 6자리 숫자를 입력해주세요.')
+    } catch (err) {
+      const code = (err as { code?: string })?.code || ''
+      if (code === 'auth/invalid-phone-number') setError('휴대폰 번호 형식이 올바르지 않습니다.')
+      else if (code === 'auth/too-many-requests') setError('요청이 너무 많습니다. 잠시 후 다시 시도해주세요.')
+      else setError('인증번호 발송에 실패했습니다. (' + code + ')')
+    } finally { setPhoneLoading(false) }
+  }
+
+  async function handleVerifyCode() {
+    if (!confirmRes) return
+    setError('')
+    try {
+      await confirmRes.confirm(smsCode.trim())
+      router.push('/dashboard'); router.refresh()
+    } catch {
+      setError('인증번호가 올바르지 않습니다. 다시 확인해주세요.')
+    }
+  }
+
+  async function handleReset() {
+    setError(''); setResetMsg('')
+    if (!email.trim()) { setError('비밀번호를 재설정할 이메일을 먼저 입력해주세요.'); return }
+    try {
+      await sendPasswordResetEmail(auth, email.trim())
+      setResetMsg(`📬 ${email.trim()} 로 비밀번호 재설정 메일을 보냈어요. 받은편지함(스팸함 포함)을 확인해주세요.`)
+    } catch (err) {
+      const code = (err as { code?: string })?.code || ''
+      if (code === 'auth/user-not-found') setError('가입되지 않은 이메일입니다. 구글로 가입하셨다면 위의 구글 로그인을 이용해주세요.')
+      else if (code === 'auth/invalid-email') setError('이메일 형식이 올바르지 않습니다.')
+      else setError('재설정 메일 발송에 실패했습니다. 잠시 후 다시 시도해주세요.')
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -88,6 +141,7 @@ export default function LoginForm() {
       </button>
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {error && <div style={{ fontSize: '0.82rem', padding: '10px 14px', borderRadius: 8, background: '#fef2f2', color: '#dc2626' }}>{error}</div>}
+        {resetMsg && <div style={{ fontSize: '0.82rem', padding: '10px 14px', borderRadius: 8, background: '#f0fdf4', color: '#16a34a' }}>{resetMsg}</div>}
         <div>
           <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, marginBottom: 6, color: 'var(--text-muted)' }}>{tr('auth.login.email')}</label>
           <input style={inputStyle} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" />
@@ -101,7 +155,43 @@ export default function LoginForm() {
           {loading ? tr('auth.login.btnLoading') : tr('auth.login.btn')}
         </button>
       </form>
-      <p style={{ textAlign: 'center', fontSize: '0.82rem', marginTop: 16, color: 'var(--text-faint)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 16, marginBottom: 12 }}>
+        <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+        <span style={{ fontSize: '0.75rem', color: 'var(--text-faint)' }}>또는 휴대폰으로 로그인</span>
+        <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+      </div>
+      {!confirmRes ? (
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input style={{ ...inputStyle, flex: 1 }} type="tel" value={phone} onChange={e => setPhone(e.target.value)}
+            placeholder="010-1234-5678" />
+          <button type="button" onClick={handleSendCode} disabled={phoneLoading}
+            style={{ padding: '10px 14px', borderRadius: 8, border: 'none', background: 'var(--accent)', color: 'white', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer', whiteSpace: 'nowrap', opacity: phoneLoading ? 0.6 : 1 }}>
+            {phoneLoading ? '전송 중...' : '인증번호 받기'}
+          </button>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input style={{ ...inputStyle, flex: 1, letterSpacing: 4, textAlign: 'center' }} type="text" inputMode="numeric" maxLength={6}
+            value={smsCode} onChange={e => setSmsCode(e.target.value)} placeholder="123456" />
+          <button type="button" onClick={handleVerifyCode}
+            style={{ padding: '10px 14px', borderRadius: 8, border: 'none', background: 'var(--accent)', color: 'white', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+            확인
+          </button>
+          <button type="button" onClick={() => { setConfirmRes(null); setSmsCode('') }}
+            style={{ padding: '10px 10px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-tertiary)', color: 'var(--text-muted)', fontSize: '0.8rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+            재입력
+          </button>
+        </div>
+      )}
+      <div id="bcb-recaptcha" />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12 }}>
+        <button type="button" onClick={handleReset}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.78rem', color: 'var(--text-faint)', textDecoration: 'underline', padding: 0 }}>
+          비밀번호를 잊으셨나요?
+        </button>
+        <span style={{ fontSize: '0.72rem', color: 'var(--text-faint)' }}>아이디는 가입한 이메일이에요</span>
+      </div>
+      <p style={{ textAlign: 'center', fontSize: '0.82rem', marginTop: 12, color: 'var(--text-faint)' }}>
         {tr('auth.login.noAccount')}{' '}
         <Link href="/register" style={{ fontWeight: 600, color: 'var(--accent-text)' }}>{tr('common.register')}</Link>
       </p>

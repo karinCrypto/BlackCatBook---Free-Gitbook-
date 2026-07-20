@@ -135,8 +135,10 @@ export default function DashboardPage() {
       {/* HEADER */}
       <header style={{ height:60, background:'var(--header-bg)', borderBottom:'1px solid var(--border)',
         position:'sticky', top:0, zIndex:50, display:'flex', alignItems:'center', padding:'0 24px', gap:12 }}>
-        <img src="/logo.png" alt="BlackCatBook" style={{ width:32, height:32, objectFit:'contain' }} />
-        <span style={{ fontWeight:800, fontSize:'1.05rem', color:'var(--text)' }}>BlackCatBook</span>
+        <a href="/dashboard" style={{ display:'flex', alignItems:'center', gap:12, textDecoration:'none' }}>
+          <img src="/logo.png" alt="BlackCatBook" style={{ width:32, height:32, objectFit:'contain' }} />
+          <span style={{ fontWeight:800, fontSize:'1.05rem', color:'var(--text)' }}>BlackCatBook</span>
+        </a>
         <span style={{ fontSize:'0.68rem', fontWeight:700, padding:'2px 8px', borderRadius:20,
           background:'var(--accent-light)', color:'var(--accent-text)' }}>v1.0</span>
         <div style={{ marginLeft:'auto', display:'flex', gap:8, alignItems:'center' }}>

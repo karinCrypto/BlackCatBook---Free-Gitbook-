@@ -199,12 +199,11 @@ export default function WorkspacePage() {
           </svg>
           <span className="ws-header-label">대시보드</span>
         </button>
-        <button onClick={() => window.location.reload()}
-          style={{ display:'flex', alignItems:'center', gap:6,
-            background:'none', border:'none', cursor:'pointer', padding:0, flexShrink:0 }}>
+        <a href="/dashboard"
+          style={{ display:'flex', alignItems:'center', gap:6, textDecoration:'none', flexShrink:0 }}>
           <img src="/logo.png" alt="BlackCatBook" style={{ width:26, height:26, objectFit:'contain' }} />
           <span className="ws-header-label" style={{ fontWeight:800, color:'var(--text)', fontSize:'0.95rem' }}>BlackCatBook</span>
-        </button>
+        </a>
         <span style={{ color:'var(--border)', flexShrink:0 }}>›</span>
         <span className="ws-header-wsname" style={{ fontSize:'0.875rem', color:'var(--text-muted)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:180 }}>{wsName}</span>
 
