@@ -54,6 +54,7 @@ export default function DashboardPage() {
   const [sort, setSort] = useState<Sort>('custom')
   const dragWsId = useRef<string | null>(null)
   const [folderFilter, setFolderFilter] = useState<string | null>(null)
+  const [dashTitle, setDashTitle] = useState('')
   const [search, setSearch] = useState('')
   const [themePanel, setThemePanel] = useState(false)
   const [activeTheme, setActiveTheme] = useState('midnight')
@@ -73,6 +74,7 @@ export default function DashboardPage() {
     refresh()
     const t = getTheme(); setActiveTheme(t)
     document.documentElement.setAttribute('data-theme', t)
+    setDashTitle(localStorage.getItem('bcb-dash-title') || '')
     // 클라우드에서 데이터를 내려받으면 목록 갱신
     const onCloud = () => refresh()
     window.addEventListener('bcb-cloud-updated', onCloud)
@@ -173,6 +175,15 @@ export default function DashboardPage() {
 
   return (
     <div style={{ minHeight:'100vh', background:'var(--bg)' }}>
+      {/* 📱 모바일 전용: 새 워크스페이스 플로팅 버튼 (탭바 위) */}
+      <button className="md-hide" onClick={() => setModal(true)}
+        style={{ position:'fixed', right:16, bottom:88, zIndex:140,
+          width:56, height:56, borderRadius:'50%', border:'none', cursor:'pointer',
+          background:'var(--accent)', color:'white', fontSize:28, fontWeight:800, lineHeight:1,
+          boxShadow:'0 8px 24px rgba(0,0,0,.35)', alignItems:'center', justifyContent:'center' }}>
+        +
+      </button>
+
       {/* HEADER */}
       <header style={{ height:60, background:'var(--header-bg)', borderBottom:'1px solid var(--border)',
         position:'sticky', top:0, zIndex:50, display:'flex', alignItems:'center', padding:'0 24px', gap:12 }}>
@@ -197,7 +208,18 @@ export default function DashboardPage() {
         {/* HERO */}
         <div style={{ marginBottom:32, display:'flex', alignItems:'flex-end', justifyContent:'space-between', flexWrap:'wrap', gap:16 }}>
           <div>
-            <h1 style={{ fontSize:'1.8rem', fontWeight:800, color:'var(--text)', marginBottom:4 }}>{tr('dashboard.title')}</h1>
+            <h1 onClick={() => {
+                const v = window.prompt('대시보드 이름을 바꿔보세요:', dashTitle || tr('dashboard.title'))
+                if (v === null) return
+                const t2 = v.trim()
+                setDashTitle(t2)
+                if (t2) localStorage.setItem('bcb-dash-title', t2)
+                else localStorage.removeItem('bcb-dash-title')
+              }}
+              title="클릭해서 이름 바꾸기"
+              style={{ fontSize:'1.8rem', fontWeight:800, color:'var(--text)', marginBottom:4, cursor:'pointer' }}>
+              {dashTitle || tr('dashboard.title')} <span style={{ fontSize:'0.85rem', opacity:.35 }}>✏️</span>
+            </h1>
             <p style={{ color:'var(--text-muted)', fontSize:'0.875rem', whiteSpace:'pre-line' }}>{tr('dashboard.subtitle')}</p>
           </div>
           {workspaces.length > 0 && (
