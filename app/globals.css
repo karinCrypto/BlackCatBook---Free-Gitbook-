@@ -202,3 +202,10 @@ body {
 @media (min-width: 769px) {
   .md-hide { display: none !important; }
 }
+
+/* 모바일 하단 탭바 — 768px 미만에서만 */
+.bcb-mobile-tabbar { display: none; }
+@media (max-width: 767px) {
+  .bcb-mobile-tabbar { display: flex; }
+  .bcb-mobile-pad { padding-bottom: 76px; }
+}

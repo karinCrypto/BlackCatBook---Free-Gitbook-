@@ -45,6 +45,12 @@ export default function PricingPage() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '48px 24px' }}>
       <div style={{ maxWidth: 820, margin: '0 auto', textAlign: 'center' }}>
+        <button onClick={() => history.length > 1 ? history.back() : location.assign('/dashboard')}
+          style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8,
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600, padding: '4px 0' }}>
+          ← 돌아가기
+        </button>
         <a href="/dashboard" style={{ textDecoration: 'none' }}>
           <img src="/logo.png" alt="BlackCatBook" style={{ width: 64, height: 64, objectFit: 'contain', margin: '0 auto 12px', display: 'block' }} />
         </a>
