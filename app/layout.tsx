@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import AuthProvider from '@/components/auth/AuthProvider'
 
 export const metadata: Metadata = {
   title: { default: 'BlackCatBook', template: '%s | BlackCatBook' },
@@ -32,7 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           })();
         `}} />
       </head>
-      <body className="min-h-screen">{children}</body>
+      <body className="min-h-screen"><AuthProvider>{children}</AuthProvider></body>
     </html>
   )
 }

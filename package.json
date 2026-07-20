@@ -12,6 +12,7 @@
     "@hello-pangea/dnd": "^18.0.1",
     "@supabase/ssr": "^0.10.0",
     "@supabase/supabase-js": "^2.101.0",
+    "firebase": "^12.16.0",
     "isomorphic-dompurify": "^3.7.1",
     "marked": "^17.0.5",
     "next": "16.2.1",

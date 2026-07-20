@@ -13,6 +13,8 @@ export type Page = {
 
 export type PageTreeNode = Page & { children: PageTreeNode[] }
 
+import { notifyDataChanged } from '@/lib/firebase/syncBus'
+
 function key(workspaceId: string) { return `bcb-pages-${workspaceId}` }
 
 export function getPages(workspaceId: string): Page[] {
@@ -28,6 +30,7 @@ export function getPage(workspaceId: string, pageId: string): Page | null {
 
 function save(workspaceId: string, pages: Page[]) {
   localStorage.setItem(key(workspaceId), JSON.stringify(pages))
+  notifyDataChanged()
 }
 
 export function createPage(data: Omit<Page, 'id' | 'createdAt' | 'updatedAt'>): Page {

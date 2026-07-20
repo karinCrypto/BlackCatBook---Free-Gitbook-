@@ -8,6 +8,8 @@ export type Workspace = {
   createdAt: string
 }
 
+import { notifyDataChanged } from '@/lib/firebase/syncBus'
+
 const KEY = 'bcb-workspaces'
 
 export function getWorkspaces(): Workspace[] {
@@ -25,12 +27,14 @@ export function createWorkspace(data: Omit<Workspace, 'id' | 'createdAt'>): Work
   const ws: Workspace = { ...data, id: crypto.randomUUID(), createdAt: new Date().toISOString() }
   const all = getWorkspaces()
   localStorage.setItem(KEY, JSON.stringify([ws, ...all]))
+  notifyDataChanged()
   return ws
 }
 
 export function updateWorkspace(id: string, data: Partial<Workspace>): Workspace {
   const all = getWorkspaces().map(w => w.id === id ? { ...w, ...data } : w)
   localStorage.setItem(KEY, JSON.stringify(all))
+  notifyDataChanged()
   return all.find(w => w.id === id)!
 }
 
@@ -38,4 +42,5 @@ export function deleteWorkspace(id: string): void {
   const all = getWorkspaces().filter(w => w.id !== id)
   localStorage.setItem(KEY, JSON.stringify(all))
   localStorage.removeItem(`bcb-pages-${id}`)
+  notifyDataChanged()
 }

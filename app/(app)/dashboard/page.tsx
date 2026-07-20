@@ -7,6 +7,7 @@ import { getPages } from '@/lib/localStorage/pages'
 import { getTheme, setTheme } from '@/lib/localStorage/theme'
 import { useT } from '@/lib/i18n'
 import LangSwitcher from '@/components/layout/LangSwitcher'
+import UserChip from '@/components/auth/UserChip'
 
 const THEMES = [
   { id: 'glacier', label: 'Glacier', colors: ['#fff','#3b82f6'] },
@@ -17,13 +18,19 @@ const THEMES = [
 ]
 
 const TYPE_META: Record<string, { gradient: string }> = {
-  tech_docs:  { gradient: 'linear-gradient(135deg,#3b82f6,#6366f1)' },
-  blog:       { gradient: 'linear-gradient(135deg,#f43f5e,#fb923c)' },
-  portfolio:  { gradient: 'linear-gradient(135deg,#a855f7,#ec4899)' },
+  tech_docs:   { gradient: 'linear-gradient(135deg,#3b82f6,#6366f1)' },
+  blog:        { gradient: 'linear-gradient(135deg,#f43f5e,#fb923c)' },
+  portfolio:   { gradient: 'linear-gradient(135deg,#a855f7,#ec4899)' },
+  certificate: { gradient: 'linear-gradient(135deg,#f59e0b,#ef4444)' },
+  exam:        { gradient: 'linear-gradient(135deg,#06b6d4,#3b82f6)' },
+  budget:      { gradient: 'linear-gradient(135deg,#10b981,#059669)' },
+  business:    { gradient: 'linear-gradient(135deg,#8b5cf6,#6366f1)' },
+  idea:        { gradient: 'linear-gradient(135deg,#f97316,#eab308)' },
 }
 
 const TYPE_EMOJIS: Record<string, string> = {
   tech_docs: '📖', blog: '✍️', portfolio: '🎨',
+  certificate: '🏆', exam: '📝', budget: '💰', business: '🚀', idea: '💡',
 }
 
 const EMOJIS = ['📖','✍️','🎨','🚀','💡','🔬','🎵','🌍','⚙️','🦋','🐱','🔥','💎','🌙','🌿']
@@ -61,6 +68,10 @@ export default function DashboardPage() {
     refresh()
     const t = getTheme(); setActiveTheme(t)
     document.documentElement.setAttribute('data-theme', t)
+    // 클라우드에서 데이터를 내려받으면 목록 갱신
+    const onCloud = () => refresh()
+    window.addEventListener('bcb-cloud-updated', onCloud)
+    return () => window.removeEventListener('bcb-cloud-updated', onCloud)
   }, [])
 
   useEffect(() => {
@@ -109,9 +120,14 @@ export default function DashboardPage() {
   }
 
   const TYPES = [
-    { id: 'tech_docs', label: `📖 ${tr('dashboard.type.tech_docs')}`, desc: tr('dashboard.type.tech_docs.desc') },
-    { id: 'blog',      label: `✍️ ${tr('dashboard.type.blog')}`,      desc: tr('dashboard.type.blog.desc') },
-    { id: 'portfolio', label: `🎨 ${tr('dashboard.type.portfolio')}`,  desc: tr('dashboard.type.portfolio.desc') },
+    { id: 'tech_docs',   label: `📖 ${tr('dashboard.type.tech_docs')}`,   desc: tr('dashboard.type.tech_docs.desc') },
+    { id: 'blog',        label: `✍️ ${tr('dashboard.type.blog')}`,         desc: tr('dashboard.type.blog.desc') },
+    { id: 'portfolio',   label: `🎨 ${tr('dashboard.type.portfolio')}`,    desc: tr('dashboard.type.portfolio.desc') },
+    { id: 'certificate', label: `🏆 ${tr('dashboard.type.certificate')}`,  desc: tr('dashboard.type.certificate.desc') },
+    { id: 'exam',        label: `📝 ${tr('dashboard.type.exam')}`,         desc: tr('dashboard.type.exam.desc') },
+    { id: 'budget',      label: `💰 ${tr('dashboard.type.budget')}`,       desc: tr('dashboard.type.budget.desc') },
+    { id: 'business',    label: `🚀 ${tr('dashboard.type.business')}`,     desc: tr('dashboard.type.business.desc') },
+    { id: 'idea',        label: `💡 ${tr('dashboard.type.idea')}`,         desc: tr('dashboard.type.idea.desc') },
   ]
 
   return (
@@ -125,9 +141,7 @@ export default function DashboardPage() {
           background:'var(--accent-light)', color:'var(--accent-text)' }}>v1.0</span>
         <div style={{ marginLeft:'auto', display:'flex', gap:8, alignItems:'center' }}>
           <LangSwitcher />
-          <Link href="/login" style={{ fontSize:'0.82rem', color:'var(--text-muted)', padding:'6px 12px', borderRadius:8, textDecoration:'none' }}>
-            {tr('common.login')}
-          </Link>
+          <UserChip />
           <button onClick={() => setModal(true)}
             style={{ fontSize:'0.85rem', fontWeight:700, padding:'8px 16px', borderRadius:8,
               background:'var(--accent)', color:'white', border:'none', cursor:'pointer', display:'flex', alignItems:'center', gap:6 }}>
@@ -373,7 +387,7 @@ export default function DashboardPage() {
                 placeholder={tr('dashboard.modal.namePlaceholder')} autoFocus
                 onKeyDown={e => e.key==='Enter' && handleCreate()} />
               <label style={{ fontSize:'0.78rem', fontWeight:700, color:'var(--text-muted)', textTransform:'uppercase', letterSpacing:'.05em', display:'block', marginTop:16 }}>{tr('dashboard.modal.typeLabel')}</label>
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:8, marginTop:6 }}>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8, marginTop:6 }}>
                 {TYPES.map(t => (
                   <button key={t.id} onClick={() => { setType(t.id); setWsEmoji(TYPE_EMOJIS[t.id]) }}
                     style={{ padding:'10px 8px', borderRadius:10, textAlign:'center',

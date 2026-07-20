@@ -2,9 +2,19 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { isSupabaseConfigured, createClient } from '@/lib/supabase/client'
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { auth, isFirebaseConfigured } from '@/lib/firebase/client'
 import { useT } from '@/lib/i18n'
 import LangSwitcher from '@/components/layout/LangSwitcher'
+
+function friendlyError(code: string, fallback: string): string {
+  switch (code) {
+    case 'auth/email-already-in-use': return '이미 가입된 이메일입니다. 로그인해주세요.'
+    case 'auth/invalid-email': return '이메일 형식이 올바르지 않습니다.'
+    case 'auth/weak-password': return '비밀번호는 8자 이상으로 설정해주세요.'
+    default: return fallback
+  }
+}
 
 export default function RegisterForm() {
   const tr = useT()
@@ -15,19 +25,21 @@ export default function RegisterForm() {
   const [error, setError] = useState('')
   const [done, setDone] = useState(false)
   const router = useRouter()
-  const supabaseReady = isSupabaseConfigured()
+  const supabaseReady = isFirebaseConfigured()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!supabaseReady) { router.push('/dashboard'); return }
     setLoading(true); setError('')
     try {
-      const supabase = createClient()
-      const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name }, emailRedirectTo: `${location.origin}/auth/callback` } })
-      if (error) { setError(error.message); setLoading(false); return }
-      setDone(true)
-    } catch {
-      setError(tr('auth.register.error')); setLoading(false)
+      const cred = await createUserWithEmailAndPassword(auth, email, password)
+      if (name.trim()) await updateProfile(cred.user, { displayName: name.trim() })
+      // Firebase는 이메일 인증 대기 없이 즉시 로그인 상태 — 바로 대시보드로
+      router.push('/dashboard'); router.refresh()
+    } catch (err) {
+      const code = (err as { code?: string })?.code || ''
+      setError(friendlyError(code, tr('auth.register.error')))
+      setLoading(false)
     }
   }
 
