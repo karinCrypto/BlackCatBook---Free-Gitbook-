@@ -1,5 +1,5 @@
 import RequireAuth from '@/components/auth/RequireAuth'
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+export default function WorkspaceLayout({ children }: { children: React.ReactNode }) {
   return <RequireAuth>{children}</RequireAuth>
 }

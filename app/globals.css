@@ -181,7 +181,24 @@ body {
 .sidebar-row:hover .sidebar-item-menu-btn { opacity: 1 !important; }
 
 /* MOBILE */
+.md-hide { display: none !important; }
 @media (max-width: 768px) {
+  .md-hide { display: flex !important; }
+  .md-show { display: none !important; }
   .sidebar-mobile-hidden { transform: translateX(-100%); }
   .sidebar-mobile-open   { transform: translateX(0); }
+
+  /* Workspace header mobile: compress text labels */
+  .ws-header-label { display: none !important; }
+  .ws-header-wsname { max-width: 100px !important; font-size: .8rem !important; }
+
+  /* Editor mobile */
+  .editor-content { padding: 16px !important; font-size: .95rem !important; }
+
+  /* Dashboard mobile */
+  .dashboard-grid { grid-template-columns: 1fr !important; }
+}
+
+@media (min-width: 769px) {
+  .md-hide { display: none !important; }
 }

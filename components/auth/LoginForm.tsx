@@ -74,16 +74,7 @@ export default function LoginForm() {
         {tr('auth.login.title')}
       </h2>
       <div style={{ marginBottom: 20, padding: '10px 14px', borderRadius: 10, background: 'var(--accent-light)', border: '1px solid var(--border)', fontSize: '0.82rem', color: 'var(--accent-text)', textAlign: 'center' }}>
-        {tr('auth.login.freebanner')}
-      </div>
-      <button onClick={() => router.push('/dashboard')}
-        style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: 'var(--accent)', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.95rem', marginBottom: 16 }}>
-        {tr('auth.login.freeBtn')}
-      </button>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-        <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-        <span style={{ fontSize: '0.75rem', color: 'var(--text-faint)' }}>{tr('auth.login.orLogin')}</span>
-        <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+        ☁️ 로그인하면 모든 문서가 클라우드에 안전하게 저장돼요
       </div>
       <button onClick={handleGoogle}
         style={{ width: '100%', padding: '11px 0', borderRadius: 12, fontWeight: 600, fontSize: '0.875rem', marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer', background: 'var(--bg-tertiary)', color: 'var(--text)', border: '1px solid var(--border)' }}>

@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
         raw = await generateWithOpenAI(apiKey.trim(), model || 'gpt-4o', prompt)
         break
       case 'gemini':
-        raw = await generateWithGemini(apiKey.trim(), model || 'gemini-1.5-flash', prompt)
+        raw = await generateWithGemini(apiKey.trim(), model || 'gemini-2.0-flash', prompt)
         break
       case 'anthropic':
       default:
