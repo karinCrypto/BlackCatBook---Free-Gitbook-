@@ -64,7 +64,7 @@ export default function LandingContent() {
       <section className="text-center pb-24 px-6">
         <div className="inline-block p-10 rounded-3xl max-w-lg w-full"
           style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
-          <div className="text-4xl mb-4">🐈‍⬛</div>
+          <img src="/logo-black.png" alt="" style={{ width: 56, height: 56, borderRadius: 14, objectFit: 'cover', margin: '0 auto 16px', display: 'block' }} />
           <h2 className="text-2xl font-black mb-3" style={{ color: 'var(--text)' }}>{tr('landing.cta2.title')}</h2>
           <p className="mb-6 text-sm" style={{ color: 'var(--text-muted)' }}>{tr('landing.cta2.desc')}</p>
           <Link href="/dashboard" className="block w-full py-3 rounded-xl font-bold text-center transition-all hover:opacity-90"

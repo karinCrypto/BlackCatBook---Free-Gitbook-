@@ -29,6 +29,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             try {
               var t = localStorage.getItem('bcb-theme') || 'midnight';
               document.documentElement.setAttribute('data-theme', t);
+              var fs = parseInt(localStorage.getItem('bcb-font-scale') || '100', 10);
+              if (fs && fs !== 100) document.documentElement.style.fontSize = fs + '%';
             } catch(e){}
           })();
         `}} />

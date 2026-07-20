@@ -10,6 +10,7 @@ import DocViewer from '@/components/editor/DocViewer'
 import ShareModal from '@/components/workspace/ShareModal'
 import AIWritePanel from '@/components/editor/AIWritePanel'
 import PdfLibraryPage from '@/components/pdf/PdfLibraryPage'
+import FontSizeControl from '@/components/layout/FontSizeControl'
 import type { Page } from '@/lib/localStorage/pages'
 
 const THEMES = [
@@ -208,6 +209,7 @@ export default function WorkspacePage() {
         <span className="ws-header-wsname" style={{ fontSize:'0.875rem', color:'var(--text-muted)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:180 }}>{wsName}</span>
 
         <div style={{ marginLeft:'auto', display:'flex', gap:6, alignItems:'center' }}>
+          <FontSizeControl />
           {/* Export — desktop only */}
           <button onClick={handleExport} title="내보내기" className="md-show"
             style={{ background:'none', border:'none', cursor:'pointer', color:'var(--text-muted)', padding:6, borderRadius:6 }}>

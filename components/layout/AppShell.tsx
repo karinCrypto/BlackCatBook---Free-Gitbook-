@@ -41,10 +41,10 @@ export default function AppShell({ children, profile, tokenBalance }: Props) {
           <span style={{ display: 'block', width: 20, height: 2, background: 'var(--text-muted)', borderRadius: 2 }} />
         </button>
 
-        <Link href="/dashboard" className="flex items-center gap-2 flex-1 no-underline">
-          <span className="text-xl">🦇</span>
+        <a href="/dashboard" className="flex items-center gap-2 flex-1 no-underline">
+          <img src="/logo.png" alt="BlackCatBook" style={{ width: 26, height: 26, objectFit: 'contain' }} />
           <span className="font-black text-base hidden sm:block" style={{ color: 'var(--text)' }}>BlackCatBook</span>
-        </Link>
+        </a>
 
         <div className="flex items-center gap-3 ml-auto">
           {tokenBalance && (

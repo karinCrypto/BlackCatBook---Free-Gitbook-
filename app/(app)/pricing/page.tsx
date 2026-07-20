@@ -69,7 +69,7 @@ export default function PricingPage() {
           {/* PREMIUM */}
           <div style={{ ...card, border: '2px solid #f43f5e', position: 'relative' }}>
             <span style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#f43f5e', color: 'white', fontSize: '0.7rem', fontWeight: 800, padding: '3px 12px', borderRadius: 100 }}>
-              🐱 추천
+              추천
             </span>
             <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#f43f5e', marginBottom: 6 }}>프리미엄</div>
             <div style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--text)', marginBottom: 18 }}>₩4,900<span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-faint)' }}> /월</span></div>

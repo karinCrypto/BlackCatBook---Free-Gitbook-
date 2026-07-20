@@ -8,6 +8,7 @@ import { getTheme, setTheme } from '@/lib/localStorage/theme'
 import { useT } from '@/lib/i18n'
 import LangSwitcher from '@/components/layout/LangSwitcher'
 import UserChip from '@/components/auth/UserChip'
+import FontSizeControl from '@/components/layout/FontSizeControl'
 import { usePlan, FREE_LIMITS } from '@/lib/firebase/premium'
 
 const THEMES = [
@@ -149,6 +150,7 @@ export default function DashboardPage() {
         <span style={{ fontSize:'0.68rem', fontWeight:700, padding:'2px 8px', borderRadius:20,
           background:'var(--accent-light)', color:'var(--accent-text)' }}>v1.0</span>
         <div style={{ marginLeft:'auto', display:'flex', gap:8, alignItems:'center' }}>
+          <FontSizeControl />
           <LangSwitcher />
           <UserChip />
           <button onClick={() => setModal(true)}
@@ -203,7 +205,9 @@ export default function DashboardPage() {
                 transition:'transform .18s, box-shadow .18s' }}
               onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform='translateY(-2px)'; el.style.boxShadow='var(--shadow-lg)' }}
               onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform=''; el.style.boxShadow='' }}>
-              <div style={{ width:52, height:52, borderRadius:14, background:'linear-gradient(135deg,#8b5cf6,#06b6d4)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:26, flexShrink:0 }}>🐱</div>
+              <div style={{ width:52, height:52, borderRadius:14, overflow:'hidden', flexShrink:0 }}>
+                <img src="/logo-black.png" alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+              </div>
               <div style={{ flex:1 }}>
                 <div style={{ fontWeight:800, fontSize:'1rem', color:'var(--text)', marginBottom:3 }}>BlackCatBook Notes & Tools</div>
                 <div style={{ fontSize:'0.82rem', color:'var(--text-muted)' }}>리치 에디터 · 꿈 노트 · 감사 일기 · PDF 라이브러리 · 드로잉</div>
@@ -246,7 +250,7 @@ export default function DashboardPage() {
                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform='translateY(-3px)'; el.style.boxShadow='var(--shadow-lg)' }}
                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform=''; el.style.boxShadow='' }}>
                 <div style={{ height:72, background:'linear-gradient(135deg,#8b5cf6,#06b6d4)', display:'flex', alignItems:'center', padding:'0 18px', gap:12 }}>
-                  <span style={{ fontSize:28 }}>🐱</span>
+                  <img src="/logo-black.png" alt="" style={{ width:36, height:36, borderRadius:9, objectFit:'cover' }} />
                   <span style={{ fontSize:'0.78rem', fontWeight:700, padding:'3px 10px', borderRadius:20, background:'rgba(255,255,255,.22)', color:'white', letterSpacing:'.04em' }}>NOTES & TOOLS</span>
                 </div>
                 <div style={{ padding:'14px 18px 16px' }}>

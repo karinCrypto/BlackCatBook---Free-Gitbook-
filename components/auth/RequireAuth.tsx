@@ -14,8 +14,9 @@ export default function RequireAuth({ children }: { children: React.ReactNode })
 
   if (loading || !user) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-        🐱 로딩 중...
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+        <img src="/logo-black.png" alt="" style={{ width: 56, height: 56, borderRadius: 14, objectFit: 'cover' }} />
+        로딩 중...
       </div>
     )
   }

@@ -41,7 +41,7 @@ export const t: Record<Lang, Record<string, string>> = {
     'common.free': '무료',
 
     // Landing
-    'landing.badge': '🦇 AI 글쓰기 기능 출시 예정',
+    'landing.badge': 'AI 글쓰기 기능 출시 예정',
     'landing.hero.title1': '문서화의 새로운 기준,',
     'landing.hero.desc': '기술 문서, 블로그, 포트폴리오를 하나의 플랫폼에서.\n마크다운, 리치 에디터, AI 자동 정리까지 모두 지원합니다.',
     'landing.cta.start': '무료로 시작하기 →',
