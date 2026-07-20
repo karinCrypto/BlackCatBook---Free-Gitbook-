@@ -12,7 +12,8 @@ type TocItem = { id: string; text: string; level: number }
 export default function DocViewer({ page, onEdit }: Props) {
   const contentRef = useRef<HTMLDivElement>(null)
   const [toc, setToc] = useState<TocItem[]>([])
-  const [tocOpen, setTocOpen] = useState(true)
+  // 모바일에서는 목차를 접은 상태로 시작 (탭해서 펼치기)
+  const [tocOpen, setTocOpen] = useState(() => typeof window === 'undefined' || window.innerWidth >= 768)
 
   // Assign heading IDs and build TOC
   useEffect(() => {
