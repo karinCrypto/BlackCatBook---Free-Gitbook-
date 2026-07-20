@@ -14,6 +14,7 @@ import FontSizeControl from '@/components/layout/FontSizeControl'
 import { usePlan, FREE_LIMITS } from '@/lib/firebase/premium'
 import { NOTE_TEMPLATES, type NoteTemplate } from '@/lib/templates'
 import DrawingOverlay from '@/components/editor/DrawingOverlay'
+import CalculatorPopup from '@/components/tools/CalculatorPopup'
 import type { Page } from '@/lib/localStorage/pages'
 
 const THEMES = [
@@ -40,6 +41,7 @@ export default function WorkspacePage() {
   const [aiPanelOpen, setAiPanelOpen] = useState(false)
   const [templateModal, setTemplateModal] = useState(false)
   const [penMode, setPenMode] = useState(false)
+  const [calcOpen, setCalcOpen] = useState(false)
   const [variantPick, setVariantPick] = useState<{ tpl: NoteTemplate; variantId: string } | null>(null)
   type FeatureView = 'pages' | 'pdf-library' | 'dream-note' | 'gratitude' | 'drawing'
   const [activeView, setActiveView] = useState<FeatureView>('pages')
@@ -233,6 +235,12 @@ export default function WorkspacePage() {
         <span className="ws-header-wsname" style={{ fontSize:'0.875rem', color:'var(--text-muted)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:180 }}>{wsName}</span>
 
         <div style={{ marginLeft:'auto', display:'flex', gap:6, alignItems:'center' }}>
+          <button onClick={() => setCalcOpen(o => !o)} title="계산기 (일반/공학용)"
+            style={{ display:'flex', alignItems:'center', gap:5, padding:'6px 10px', borderRadius:8,
+              border:'1px solid var(--border)', background: calcOpen ? 'var(--accent-light)' : 'var(--bg-tertiary)',
+              color:'var(--text)', cursor:'pointer', fontSize:'0.78rem', fontWeight:700, whiteSpace:'nowrap' }}>
+            🧮
+          </button>
           <button onClick={() => setPenMode(true)} title="화면 판서 (강의 모드) — 지금 보는 화면 위에 그려요"
             style={{ display:'flex', alignItems:'center', gap:5, padding:'6px 12px', borderRadius:8,
               border:'1px solid var(--border)', background:'var(--bg-tertiary)', color:'var(--text)',
@@ -504,6 +512,9 @@ export default function WorkspacePage() {
 
       {/* 화면 판서 오버레이 — 강의자용 */}
       {penMode && <DrawingOverlay onClose={() => setPenMode(false)} />}
+
+      {/* 🧮 계산기 팝업 */}
+      {calcOpen && <CalculatorPopup onClose={() => setCalcOpen(false)} />}
 
       {/* TEMPLATE GALLERY MODAL */}
       {templateModal && (

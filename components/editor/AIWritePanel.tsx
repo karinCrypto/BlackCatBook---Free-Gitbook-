@@ -192,7 +192,7 @@ export default function AIWritePanel({ onInsert, onClose }: Props) {
           <div style={{ fontSize: '1.05rem', fontWeight: 900, color: 'var(--text)' }}>AI 편집은 프리미엄 전용이에요</div>
           <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.7 }}>
             글 붙여넣기 → 블로그·보고서·SNS 글로 즉시 변환<br />
-            SEO 메타태그 + GEO 키워드 자동 생성까지
+            SEO 키워드 자동 생성까지
           </div>
           <button onClick={() => router.push('/pricing')}
             style={{ marginTop: 6, padding: '12px 28px', borderRadius: 12, border: 'none', cursor: 'pointer', background: '#f43f5e', color: 'white', fontWeight: 800, fontSize: '0.9rem' }}>

@@ -146,13 +146,13 @@ export default function DrawingOverlay({ onClose }: Props) {
         }}
       />
 
-      {/* Floating palette */}
+      {/* Floating palette — 하단 배치로 본문을 가리지 않는다 */}
       <div style={{
-        position: 'fixed', top: 72, left: '50%', transform: 'translateX(-50%)',
-        zIndex: 501,
+        position: 'fixed', bottom: 18, left: '50%', transform: 'translateX(-50%)',
+        zIndex: 501, maxWidth: '96vw',
         display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', justifyContent: 'center',
-        background: 'rgba(20,20,30,.88)', backdropFilter: 'blur(12px)',
-        borderRadius: 14, padding: '8px 14px',
+        background: 'rgba(20,20,30,.72)', backdropFilter: 'blur(12px)',
+        borderRadius: 14, padding: '6px 12px',
         boxShadow: '0 4px 24px rgba(0,0,0,.4)',
         userSelect: 'none',
       }}>
