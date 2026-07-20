@@ -196,12 +196,13 @@ export default function DashboardPage() {
             <FontSizeControl />
             <LangSwitcher />
           </span>
-          <UserChip />
-          <button onClick={() => setModal(true)}
-            style={{ fontSize:'0.85rem', fontWeight:700, padding:'8px 16px', borderRadius:8,
-              background:'var(--accent)', color:'white', border:'none', cursor:'pointer', display:'flex', alignItems:'center', gap:6 }}>
+          <span className="md-show"><UserChip /></span>
+          {/* 애플식 미니멀: 작은 + 아이콘 버튼 (모바일은 FAB가 담당) */}
+          <button className="md-show" onClick={() => setModal(true)} title={tr('dashboard.newWorkspace')}
+            style={{ width:30, height:30, borderRadius:'50%', flexShrink:0,
+              background:'var(--accent)', color:'white', border:'none', cursor:'pointer',
+              display:'flex', alignItems:'center', justifyContent:'center' }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            {tr('dashboard.newWorkspace')}
           </button>
         </div>
       </header>
