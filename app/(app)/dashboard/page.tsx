@@ -8,6 +8,7 @@ import { getTheme, setTheme } from '@/lib/localStorage/theme'
 import { useT } from '@/lib/i18n'
 import LangSwitcher from '@/components/layout/LangSwitcher'
 import UserChip from '@/components/auth/UserChip'
+import { usePlan, FREE_LIMITS } from '@/lib/firebase/premium'
 
 const THEMES = [
   { id: 'glacier', label: 'Glacier', colors: ['#fff','#3b82f6'] },
@@ -55,6 +56,7 @@ export default function DashboardPage() {
   const [activeTheme, setActiveTheme] = useState('midnight')
   const renameRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
+  const { plan } = usePlan()
 
   function refresh() {
     const ws = getWorkspaces()
@@ -80,6 +82,11 @@ export default function DashboardPage() {
 
   function handleCreate() {
     if (!name.trim()) return
+    if (plan === 'free' && workspaces.length >= FREE_LIMITS.workspaces) {
+      setModal(false)
+      if (confirm(`무료 플랜은 워크스페이스 ${FREE_LIMITS.workspaces}개까지 만들 수 있어요.\n프리미엄으로 업그레이드하시겠어요? 🐱`)) router.push('/pricing')
+      return
+    }
     const ws = createWorkspace({ name: name.trim(), type: type as Workspace['type'], theme: activeTheme, description: desc, emoji: wsEmoji } as Parameters<typeof createWorkspace>[0])
     refresh(); setModal(false); setName(''); setDesc(''); setWsEmoji('📖')
     router.push(`/workspace/${ws.id}`)

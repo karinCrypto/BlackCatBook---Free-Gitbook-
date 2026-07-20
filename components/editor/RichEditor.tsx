@@ -1,5 +1,6 @@
 'use client'
 import { useState, useRef, useEffect, useCallback } from 'react'
+import DOMPurify from 'isomorphic-dompurify'
 import type { Page } from '@/lib/localStorage/pages'
 
 const HIGHLIGHT_COLORS = [
@@ -9,6 +10,17 @@ const HIGHLIGHT_COLORS = [
   { color: '#fecdd3', label: '분홍' },
   { color: '#fed7aa', label: '주황' },
   { color: '#e9d5ff', label: '보라' },
+  { color: '#ffffff', label: '흰색' },
+]
+
+const TEXT_COLORS = [
+  { color: '#000000', label: '검정' },
+  { color: '#16a34a', label: '초록' },
+  { color: '#2563eb', label: '파랑' },
+  { color: '#dc2626', label: '빨강' },
+  { color: '#db2777', label: '핑크' },
+  { color: '#ca8a04', label: '노랑' },
+  { color: '#ffffff', label: '흰색' },
 ]
 
 type Props = {
@@ -27,6 +39,7 @@ export default function RichEditor({ page, onSave, onDone, onRegisterInsert }: P
   const [linkText, setLinkText] = useState('')
   const [linkUrl, setLinkUrl] = useState('')
   const [highlightOpen, setHighlightOpen] = useState(false)
+  const [colorOpen, setColorOpen] = useState(false)
   const [wordCount, setWordCount] = useState(0)
   const [imgToolbar, setImgToolbar] = useState<{ img: HTMLImageElement; x: number; y: number } | null>(null)
   const editorRef = useRef<HTMLDivElement>(null)
@@ -222,8 +235,26 @@ export default function RichEditor({ page, onSave, onDone, onRegisterInsert }: P
     color:'var(--text)', fontSize:'0.875rem', outline:'none', marginBottom:12,
   }
 
+  function handleBack() {
+    const c = editorRef.current?.innerHTML || ''
+    if (onDone) onDone(c, title)
+  }
+
   return (
     <div style={{ maxWidth:800, margin:'0 auto', padding:'32px 24px 80px' }}>
+      {/* Back button */}
+      {onDone && (
+        <button onClick={handleBack}
+          style={{ display:'inline-flex', alignItems:'center', gap:5, marginBottom:20,
+            background:'none', border:'none', cursor:'pointer', padding:'4px 6px',
+            color:'var(--text-faint)', fontSize:'0.82rem', fontWeight:500, borderRadius:6,
+            transition:'color .15s' }}
+          onMouseEnter={e => (e.currentTarget.style.color='var(--text-muted)')}
+          onMouseLeave={e => (e.currentTarget.style.color='var(--text-faint)')}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          워크스페이스
+        </button>
+      )}
       {/* Title row */}
       <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:8 }}>
         {page.emoji && <span style={{ fontSize:'2rem', lineHeight:1, flexShrink:0 }}>{page.emoji}</span>}
@@ -300,29 +331,56 @@ export default function RichEditor({ page, onSave, onDone, onRegisterInsert }: P
 
         {div}
 
-        {/* 글자 색상 — save selection on mousedown, restore before applying */}
-        <div style={{ position:'relative', width:30, height:30, flexShrink:0 }}
-          onMouseDown={() => {
+        {/* 글자 색상 — preset palette */}
+        <div style={{ position:'relative' }}>
+          <button onClick={() => {
             const sel = window.getSelection()
             if (sel?.rangeCount) savedRange.current = sel.getRangeAt(0).cloneRange()
-          }}>
-          <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:'100%', pointerEvents:'none' }}>
+            setColorOpen(o => !o)
+            setHighlightOpen(false)
+          }} title="글자 색상"
+            style={{ width:30, height:30, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
+              border:'none', borderRadius:6, cursor:'pointer',
+              background: colorOpen ? 'var(--accent-light)' : 'transparent', gap:2 }}>
             <span style={{ fontSize:'0.85rem', fontWeight:700, color:'var(--text-muted)', lineHeight:1 }}>A</span>
-            <span id="color-indicator" style={{ width:14, height:3, background:'#3b82f6', borderRadius:2, display:'block' }} />
-          </div>
-          <input type="color" defaultValue="#3b82f6" title="글자 색상"
-            onChange={e => {
-              const col = e.target.value
-              const indicator = document.getElementById('color-indicator')
-              if (indicator) indicator.style.background = col
-              if (savedRange.current) {
-                const sel = window.getSelection()
-                sel?.removeAllRanges()
-                sel?.addRange(savedRange.current)
-              }
-              exec('foreColor', col)
-            }}
-            style={{ position:'absolute', inset:0, opacity:0, width:'100%', height:'100%', cursor:'pointer' }} />
+            <span id="color-indicator" style={{ width:14, height:3, background:'#2563eb', borderRadius:2, display:'block' }} />
+          </button>
+          {colorOpen && (
+            <>
+              <div style={{ position:'fixed', inset:0, zIndex:49 }} onClick={() => setColorOpen(false)} />
+              <div style={{ position:'absolute', top:'110%', left:0, zIndex:50, background:'var(--bg)',
+                border:'1px solid var(--border)', borderRadius:10, padding:10, boxShadow:'var(--shadow-lg)',
+                display:'flex', flexDirection:'column', gap:6, minWidth:130 }}>
+                <div style={{ display:'flex', gap:5, flexWrap:'wrap' }}>
+                  {TEXT_COLORS.map(c => (
+                    <button key={c.color} onClick={() => {
+                      const indicator = document.getElementById('color-indicator')
+                      if (indicator) indicator.style.background = c.color
+                      if (savedRange.current) {
+                        const sel = window.getSelection()
+                        sel?.removeAllRanges(); sel?.addRange(savedRange.current)
+                      }
+                      exec('foreColor', c.color)
+                      setColorOpen(false)
+                    }} title={c.label}
+                      style={{ width:22, height:22, borderRadius:4, background:c.color,
+                        border:'1px solid rgba(0,0,0,.2)', cursor:'pointer' }} />
+                  ))}
+                </div>
+                <button onClick={() => {
+                  if (savedRange.current) {
+                    const sel = window.getSelection()
+                    sel?.removeAllRanges(); sel?.addRange(savedRange.current)
+                  }
+                  exec('removeFormat')
+                  setColorOpen(false)
+                }} style={{ fontSize:'0.75rem', color:'var(--text-faint)', background:'none',
+                  border:'1px solid var(--border)', borderRadius:5, padding:'3px 6px', cursor:'pointer' }}>
+                  색상 제거
+                </button>
+              </div>
+            </>
+          )}
         </div>
 
         {div}
@@ -389,11 +447,43 @@ export default function RichEditor({ page, onSave, onDone, onRegisterInsert }: P
         onDragOver={e => e.preventDefault()}
         onDrop={e => { e.preventDefault(); Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/')).forEach(insertImage) }}
         onPaste={e => {
-          const img = Array.from(e.clipboardData.items).find(i=>i.type.startsWith('image/'))
-          if (img) { e.preventDefault(); const f=img.getAsFile(); if(f) insertImage(f) }
+          const imgItem = Array.from(e.clipboardData.items).find(i=>i.type.startsWith('image/'))
+          if (imgItem) { e.preventDefault(); const f=imgItem.getAsFile(); if(f) insertImage(f); return }
+          const html = e.clipboardData.getData('text/html')
+          if (html) {
+            e.preventDefault()
+            // Sanitize with DOMPurify — removes iframes, scripts, embeds, forms, event handlers
+            const clean = DOMPurify.sanitize(html, {
+              ALLOWED_TAGS: ['b','i','u','s','strong','em','a','p','br',
+                'h1','h2','h3','h4','h5','h6','ul','ol','li',
+                'blockquote','pre','code','table','thead','tbody','tr','th','td',
+                'img','hr','span','div','sup','sub'],
+              ALLOWED_ATTR: ['href','src','alt','target','rel','style'],
+              ALLOW_DATA_ATTR: false,
+            })
+            // Strip inline styles down to safe-only (color, font-weight, text-decoration, background-color, font-style)
+            const tmp = document.createElement('div')
+            tmp.innerHTML = clean
+            tmp.querySelectorAll<HTMLElement>('[style]').forEach(el => {
+              const s = el.style
+              const safe: string[] = []
+              if (s.color) safe.push(`color:${s.color}`)
+              if (s.fontWeight) safe.push(`font-weight:${s.fontWeight}`)
+              if (s.textDecoration) safe.push(`text-decoration:${s.textDecoration}`)
+              if (s.backgroundColor) safe.push(`background-color:${s.backgroundColor}`)
+              if (s.fontStyle) safe.push(`font-style:${s.fontStyle}`)
+              el.setAttribute('style', safe.join(';'))
+            })
+            tmp.querySelectorAll<HTMLImageElement>('img').forEach(img => {
+              img.style.maxWidth = '100%'; img.removeAttribute('width'); img.removeAttribute('height')
+            })
+            document.execCommand('insertHTML', false, tmp.innerHTML)
+            autoSave()
+          }
         }}
         style={{ border:'1px solid var(--border)', borderRadius:'0 0 8px 8px', padding:'32px 40px',
-          background:'var(--bg)', minHeight:500, outline:'none' }}
+          background:'var(--bg)', minHeight:500, outline:'none',
+          overflowX:'hidden', wordBreak:'break-word', overflowWrap:'break-word' }}
       />
 
       {/* IMAGE RESIZE TOOLBAR */}

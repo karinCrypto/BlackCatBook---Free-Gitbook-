@@ -1,10 +1,12 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { useAuth } from './AuthProvider'
+import { usePlan } from '@/lib/firebase/premium'
 
 // 대시보드 우상단 로그인 상태 칩 — 로그인 시 클라우드 백업 동작 중임을 보여준다
 export default function UserChip() {
   const { user, loading, logout } = useAuth()
+  const { plan } = usePlan()
   const router = useRouter()
 
   if (loading) return null
@@ -27,6 +29,14 @@ export default function UserChip() {
     <span style={chipStyle}>
       <span title="클라우드 백업 동작 중" style={{ color: '#22c55e' }}>●</span>
       {user.displayName || user.email}
+      {plan === 'premium' ? (
+        <span style={{ background: '#f43f5e', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '2px 7px', borderRadius: 100 }}>PRO</span>
+      ) : (
+        <button onClick={() => router.push('/pricing')}
+          style={{ background: 'none', border: '1px solid #f43f5e', color: '#f43f5e', fontSize: '0.68rem', fontWeight: 700, padding: '2px 8px', borderRadius: 100, cursor: 'pointer' }}>
+          업그레이드
+        </button>
+      )}
       <button onClick={() => { void logout() }}
         style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', fontSize: '0.75rem', padding: 0 }}>
         로그아웃

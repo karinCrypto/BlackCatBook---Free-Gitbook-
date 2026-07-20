@@ -55,9 +55,9 @@ const PROVIDERS: { id: Provider; label: string; color: string; keyPrefix: string
     keyPrefix: 'AIza',
     keyFormat: 'AIzaSy...',
     models: [
-      { id: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash (무료/빠름)' },
-      { id: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro (고품질)' },
-      { id: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash' },
+      { id: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash (무료/빠름)' },
+      { id: 'gemini-2.0-flash-lite', label: 'Gemini 2.0 Flash Lite (초고속)' },
+      { id: 'gemini-2.5-pro-preview-05-06', label: 'Gemini 2.5 Pro (고품질)' },
     ],
     guide: {
       url: 'https://aistudio.google.com/app/apikey',
@@ -74,7 +74,7 @@ export default function AIWritePanel({ onInsert, onClose }: Props) {
   const [savedKeys, setSavedKeys] = useState<Record<Provider, boolean>>({ anthropic: false, openai: false, gemini: false })
   const [showKey, setShowKey] = useState(false)
   const [showGuide, setShowGuide] = useState(false)
-  const [selectedModel, setSelectedModel] = useState<Record<Provider, string>>({ anthropic: 'claude-opus-4-6', openai: 'gpt-4o', gemini: 'gemini-1.5-flash' })
+  const [selectedModel, setSelectedModel] = useState<Record<Provider, string>>({ anthropic: 'claude-opus-4-6', openai: 'gpt-4o', gemini: 'gemini-2.0-flash' })
   const [topic, setTopic] = useState('')
   const [references, setReferences] = useState('')
   const [style, setStyle] = useState('docs')

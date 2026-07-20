@@ -21,11 +21,12 @@ const PAGES = [
   { id: 'endpoints',    title: '엔드포인트',    group: 'API',      prev: 'authentication',  next: 'webhooks' },
   { id: 'webhooks',     title: '웹훅',          group: 'API',      prev: 'endpoints',       next: 'changelog' },
   { id: 'changelog',    title: '변경 로그',     group: '리소스',   prev: 'webhooks',        next: 'faq' },
-  { id: 'faq',          title: '자주 묻는 질문',group: '리소스',   prev: 'changelog',       next: null },
-  { id: 'editor',          title: '문서 편집기',  group: null,             prev: null,      next: null },
-  { id: 'dream-note',      title: '꿈 노트',      group: '노트 템플릿',  prev: null,      next: 'gratitude-journal' },
-  { id: 'gratitude-journal', title: '감사 일기',  group: '노트 템플릿',  prev: 'dream-note', next: 'pdf-library' },
-  { id: 'pdf-library',     title: 'PDF 도서관',   group: '노트 템플릿',  prev: 'gratitude-journal', next: null },
+  { id: 'faq',          title: '자주 묻는 질문',group: '리소스',   prev: 'changelog',       next: 'pdf-library' },
+  { id: 'pdf-library',  title: 'PDF 도서관',    group: '노트',     prev: 'faq',             next: 'dream-note' },
+  { id: 'dream-note',   title: '꿈 노트',       group: '노트',     prev: 'pdf-library',     next: 'gratitude' },
+  { id: 'gratitude',    title: '감사 일기',     group: '노트',     prev: 'dream-note',      next: 'drawing' },
+  { id: 'drawing',      title: '드로잉',        group: '노트',     prev: 'gratitude',       next: 'editor' },
+  { id: 'editor',       title: '리치 에디터',   group: '노트',     prev: 'drawing',         next: null },
 ];
 
 // ========== PAGE CONTENT ==========
@@ -47,40 +48,30 @@ const PAGE_CONTENT = {
       </div>
 
       <div class="cards">
-        <a class="card" href="#" data-page="quickstart">
-          <div class="card-icon">⚡</div>
-          <div class="card-title">빠른 시작</div>
-          <div class="card-desc">5분 안에 BlackCatBook을 시작하세요.</div>
-        </a>
-        <a class="card" href="#" data-page="api-overview">
-          <div class="card-icon">🔌</div>
-          <div class="card-title">API 레퍼런스</div>
-          <div class="card-desc">REST API 완전 가이드.</div>
-        </a>
-        <a class="card" href="#" data-page="integrations">
-          <div class="card-icon">🔗</div>
-          <div class="card-title">통합</div>
-          <div class="card-desc">Slack, Jira 등과 연결하세요.</div>
-        </a>
-        <a class="card" href="#" data-page="editor">
-          <div class="card-icon">✏️</div>
-          <div class="card-title">문서 편집기</div>
-          <div class="card-desc">리치 텍스트 에디터로 문서를 작성하세요.</div>
+        <a class="card" href="#" data-page="pdf-library">
+          <div class="card-icon">📖</div>
+          <div class="card-title">PDF 도서관</div>
+          <div class="card-desc">PDF를 업로드하고 책처럼 넘기며 읽으세요.</div>
         </a>
         <a class="card" href="#" data-page="dream-note">
           <div class="card-icon">🌙</div>
           <div class="card-title">꿈 노트</div>
-          <div class="card-desc">꿈을 기록하고 패턴을 분석하세요.</div>
+          <div class="card-desc">잠에서 깨어난 직후 꿈을 기록하세요.</div>
         </a>
-        <a class="card" href="#" data-page="gratitude-journal">
-          <div class="card-icon">🙏</div>
+        <a class="card" href="#" data-page="gratitude">
+          <div class="card-icon">🌿</div>
           <div class="card-title">감사 일기</div>
-          <div class="card-desc">매일 감사한 일 3가지를 기록하세요.</div>
+          <div class="card-desc">매일의 감사한 순간을 기록하세요.</div>
         </a>
-        <a class="card" href="#" data-page="pdf-library">
-          <div class="card-icon">📚</div>
-          <div class="card-title">PDF 도서관</div>
-          <div class="card-desc">PDF를 업로드하고 브라우저에서 읽으세요.</div>
+        <a class="card" href="#" data-page="drawing">
+          <div class="card-icon">🎨</div>
+          <div class="card-title">드로잉</div>
+          <div class="card-desc">자유롭게 그림을 그리고 저장하세요.</div>
+        </a>
+        <a class="card" href="#" data-page="editor">
+          <div class="card-icon">✏️</div>
+          <div class="card-title">리치 에디터</div>
+          <div class="card-desc">리치 텍스트 에디터로 문서를 작성하세요.</div>
         </a>
       </div>
 
@@ -175,9 +166,9 @@ const PAGE_CONTENT = {
           <div class="step-body">
             <div class="step-title">패키지 설치</div>
             <div class="code-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
-            <pre><code>npm install @timebook/sdk
+            <pre><code>npm install @blackcatbook/sdk
 # 또는
-yarn add @timebook/sdk</code></pre>
+yarn add @blackcatbook/sdk</code></pre>
           </div>
         </div>
         <div class="step">
@@ -192,7 +183,7 @@ yarn add @timebook/sdk</code></pre>
           <div class="step-body">
             <div class="step-title">SDK 초기화</div>
             <div class="code-header"><span>javascript</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
-            <pre><code>import { BlackCatBook } from '@timebook/sdk';
+            <pre><code>import { BlackCatBook } from '@blackcatbook/sdk';
 
 const client = new BlackCatBook({
   apiKey: process.env.TIMEBOOK_API_KEY,
@@ -243,15 +234,15 @@ await client.timers.stop(timer.id);</code></pre>
 
       <h2>패키지 매니저</h2>
       <div class="code-header"><span>npm</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
-      <pre><code>npm install @timebook/sdk</code></pre>
+      <pre><code>npm install @blackcatbook/sdk</code></pre>
       <div class="code-header"><span>yarn</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
-      <pre><code>yarn add @timebook/sdk</code></pre>
+      <pre><code>yarn add @blackcatbook/sdk</code></pre>
       <div class="code-header"><span>pnpm</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
-      <pre><code>pnpm add @timebook/sdk</code></pre>
+      <pre><code>pnpm add @blackcatbook/sdk</code></pre>
 
       <h2>CDN (브라우저)</h2>
       <div class="code-header"><span>html</span><button class="copy-btn" onclick="copyCode(this)">복사</button></div>
-      <pre><code>&lt;script src="https://cdn.timebook.io/sdk/v2/timebook.min.js"&gt;&lt;/script&gt;</code></pre>
+      <pre><code>&lt;script src="https://cdn.blackcatbook.io/sdk/v2/blackcatbook.min.js"&gt;&lt;/script&gt;</code></pre>
 
       <h2>시스템 요구 사항</h2>
       <table>
@@ -431,7 +422,7 @@ const pdf = await report.export('pdf');
       <pre><code>const client = new BlackCatBook({
   apiKey: 'tb_live_xxxxx',    // 필수
   workspace: 'my-workspace',  // 필수
-  baseURL: 'https://api.timebook.io/v2',  // 선택
+  baseURL: 'https://api.blackcatbook.io/v2',  // 선택
   timeout: 30000,             // ms, 기본값: 30000
   retries: 3,                 // 재시도 횟수, 기본값: 3
   locale: 'ko-KR',            // 응답 언어
@@ -478,9 +469,9 @@ TIMEBOOK_TIMEOUT=30000</code></pre>
       <div class="steps">
         <div class="step"><div class="step-num"></div><div class="step-body"><div class="step-title">앱 설치</div><p>Slack 워크스페이스에 BlackCatBook 앱을 설치합니다.</p></div></div>
         <div class="step"><div class="step-num"></div><div class="step-body"><div class="step-title">채널 연결</div><p>알림을 받을 Slack 채널을 선택합니다.</p></div></div>
-        <div class="step"><div class="step-num"></div><div class="step-body"><div class="step-title">슬래시 명령어 사용</div><pre><code>/timebook start 홈페이지 작업 #proj_abc
-/timebook stop
-/timebook status</code></pre></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body"><div class="step-title">슬래시 명령어 사용</div><pre><code>/blackcatbook start 홈페이지 작업 #proj_abc
+/blackcatbook stop
+/blackcatbook status</code></pre></div></div>
       </div>
     </div>
   `,
@@ -493,7 +484,7 @@ TIMEBOOK_TIMEOUT=30000</code></pre>
 
       <h2>기본 URL</h2>
       <div class="code-header"><span>Base URL</span></div>
-      <pre><code>https://api.timebook.io/v2</code></pre>
+      <pre><code>https://api.blackcatbook.io/v2</code></pre>
 
       <h2>요청 형식</h2>
       <p>모든 요청은 <code>Content-Type: application/json</code> 헤더를 포함해야 합니다.</p>
@@ -757,7 +748,7 @@ function verifyWebhook(payload, signature, secret) {
     <script>renderDreamList();</script>
   `,
 
-  'gratitude-journal': () => `
+  'gratitude': () => `
     <div class="doc-page">
       <nav class="breadcrumb"><a href="#" data-page="home">홈</a><span class="breadcrumb-sep">›</span><span>감사 일기</span></nav>
       <h1>🙏 감사 일기</h1>
@@ -817,31 +808,93 @@ function verifyWebhook(payload, signature, secret) {
     <script>renderGratitudeList(); initGratitudeDates();</script>
   `,
 
+  'drawing': () => `
+    <div class="doc-page" style="padding-bottom:0">
+      <nav class="breadcrumb"><a href="#" data-page="home">홈</a><span class="breadcrumb-sep">›</span><span>드로잉</span></nav>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+        <h1 style="margin:0">🎨 드로잉</h1>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <button data-draw-tool="pen" class="btn btn-secondary active" style="padding:5px 10px;font-size:.8rem">✏️ 펜</button>
+          <button data-draw-tool="highlight" class="btn btn-secondary" style="padding:5px 10px;font-size:.8rem">🖊 형광펜</button>
+          <button data-draw-tool="eraser" class="btn btn-secondary" style="padding:5px 10px;font-size:.8rem">🧹 지우개</button>
+          <input type="color" id="drawColor" value="#3b82f6" style="width:30px;height:30px;border-radius:6px;border:1px solid var(--border);cursor:pointer;padding:2px" title="색상" />
+          <input type="range" id="drawSize" min="1" max="20" value="4" style="width:70px" title="굵기" />
+          <button id="drawClear" class="btn btn-secondary" style="padding:5px 10px;font-size:.8rem">초기화</button>
+          <button id="drawSave" class="btn btn-primary" style="padding:5px 10px;font-size:.8rem">💾 저장</button>
+        </div>
+      </div>
+      <canvas id="pageDrawCanvas" style="border-radius:10px;border:1px solid var(--border);background:#fff;cursor:crosshair;touch-action:none;display:block;width:100%"></canvas>
+    </div>
+  `,
+
   'pdf-library': () => `
     <div class="doc-page">
       <nav class="breadcrumb"><a href="#" data-page="home">홈</a><span class="breadcrumb-sep">›</span><span>PDF 도서관</span></nav>
-      <h1>📚 PDF 도서관</h1>
-      <p class="doc-subtitle">PDF 파일을 업로드하고 브라우저에서 바로 읽어보세요. 모든 파일은 로컬에 저장됩니다.</p>
-
-      <div class="pdf-upload-zone" id="pdfUploadZone" onclick="document.getElementById('pdfFileInput').click()">
-        <input type="file" id="pdfFileInput" accept=".pdf" multiple style="display:none" onchange="handlePdfUpload(this)" />
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text-faint);margin-bottom:12px"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        <p style="font-weight:600;margin-bottom:4px">PDF 파일을 드롭하거나 클릭하여 업로드</p>
-        <p style="font-size:.82rem;color:var(--text-faint)">여러 파일 동시 업로드 가능</p>
-      </div>
-
-      <div id="pdfViewer" style="display:none;margin-top:24px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <h3 id="pdfViewerTitle" style="margin:0"></h3>
-          <button class="btn btn-secondary" onclick="closePdfViewer()">닫기</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
+        <h1 style="margin:0">📚 PDF 도서관</h1>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary" style="font-size:.8rem;padding:6px 12px" onclick="showCreateFolderPrompt()">📁 새 폴더</button>
+          <button class="btn btn-primary" style="font-size:.8rem;padding:6px 14px" onclick="document.getElementById('pdfFileInput').click()">+ PDF 추가</button>
+          <input type="file" id="pdfFileInput" accept=".pdf" multiple style="display:none" onchange="handlePdfUpload(this)" />
         </div>
-        <iframe id="pdfFrame" style="width:100%;height:75vh;border:1px solid var(--border);border-radius:var(--radius)"></iframe>
+      </div>
+      <p class="doc-subtitle" style="margin-bottom:16px">과목별·주제별 폴더로 정리하고, 책처럼 넘겨보며 필기까지 — 모든 파일은 기기에 저장됩니다.</p>
+
+      <!-- Folder tabs -->
+      <div id="pdfFolderTabs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center"></div>
+
+      <!-- Upload drop zone -->
+      <div class="pdf-upload-zone" id="pdfUploadZone">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text-faint);margin-bottom:8px"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <p style="font-weight:600;margin-bottom:4px;font-size:.9rem">PDF를 여기에 드롭하거나 위 버튼으로 추가</p>
+        <p style="font-size:.78rem;color:var(--text-faint)">여러 파일 동시 추가 가능</p>
       </div>
 
-      <h2>내 PDF 컬렉션</h2>
       <div id="pdfGrid" class="pdf-grid"></div>
     </div>
-    <script>renderPdfLibrary(); initPdfDrop();</script>
+
+    <!-- Full-screen PDF Viewer Modal -->
+    <div id="pdfViewerModal" style="display:none;position:fixed;inset:0;z-index:9000;background:var(--bg);flex-direction:column">
+      <!-- Viewer header -->
+      <div style="height:52px;background:var(--header-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0">
+        <button onclick="closePdfViewer()" style="background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px 8px;border-radius:6px;display:flex;align-items:center;gap:4px;font-size:.85rem;font-weight:600">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          닫기
+        </button>
+        <span id="pdfViewerTitle" style="font-weight:700;font-size:.95rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1"></span>
+        <!-- Page controls -->
+        <div style="display:flex;align-items:center;gap:6px">
+          <button onclick="pdfPrevPage()" id="pdfPrevBtn" style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text);padding:4px 10px;font-size:.8rem">◀</button>
+          <span style="font-size:.82rem;color:var(--text-muted)"><span id="pdfCurrentPage">1</span> / <span id="pdfTotalPages">1</span></span>
+          <button onclick="pdfNextPage()" id="pdfNextBtn" style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text);padding:4px 10px;font-size:.8rem">▶</button>
+        </div>
+        <!-- Zoom -->
+        <div style="display:flex;align-items:center;gap:4px">
+          <button onclick="pdfZoom(-0.2)" style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text);padding:4px 8px;font-size:.8rem">−</button>
+          <span id="pdfZoomLabel" style="font-size:.78rem;color:var(--text-muted);min-width:38px;text-align:center">100%</span>
+          <button onclick="pdfZoom(0.2)" style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text);padding:4px 8px;font-size:.8rem">+</button>
+        </div>
+      </div>
+      <!-- Drawing toolbar -->
+      <div style="height:44px;background:var(--bg-secondary);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:6px;flex-shrink:0">
+        <span style="font-size:.72rem;font-weight:700;color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;margin-right:4px">필기</span>
+        <button onclick="setPdfTool('none')" id="pdfToolNone" class="pdf-draw-btn active" title="선택 없음">🚫</button>
+        <button onclick="setPdfTool('pen')" id="pdfToolPen" class="pdf-draw-btn" title="펜">✏️</button>
+        <button onclick="setPdfTool('highlight')" id="pdfToolHighlight" class="pdf-draw-btn" title="형광펜">🖊</button>
+        <button onclick="setPdfTool('eraser')" id="pdfToolEraser" class="pdf-draw-btn" title="지우개">🧹</button>
+        <input type="color" id="pdfDrawColor" value="#ef4444" style="width:28px;height:28px;border-radius:6px;border:1px solid var(--border);cursor:pointer;padding:2px" title="색상" />
+        <input type="range" id="pdfDrawSize" min="1" max="20" value="3" style="width:70px" title="굵기" />
+        <button onclick="clearPdfCanvas()" style="margin-left:4px;background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text-muted);padding:3px 8px;font-size:.75rem">초기화</button>
+        <button onclick="savePdfAnnotation()" style="background:var(--accent);border:none;border-radius:6px;cursor:pointer;color:white;padding:3px 10px;font-size:.75rem;font-weight:600">저장</button>
+      </div>
+      <!-- Canvas area -->
+      <div style="flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:20px;background:#525659" id="pdfCanvasArea">
+        <div style="position:relative;display:inline-block;line-height:0">
+          <canvas id="pdfRenderCanvas" style="display:block;box-shadow:0 4px 20px rgba(0,0,0,.4)"></canvas>
+          <canvas id="pdfDrawCanvas" style="position:absolute;top:0;left:0;cursor:crosshair"></canvas>
+        </div>
+      </div>
+    </div>
   `,
 
   faq: () => `
@@ -873,7 +926,7 @@ function verifyWebhook(payload, signature, secret) {
 
       <div class="callout callout-info">
         <div class="callout-title">💬 더 궁금한 점이 있으신가요?</div>
-        <p>support@timebook.io 또는 Discord 커뮤니티에서 도움을 받으세요.</p>
+        <p>support@blackcatbook.io 또는 Discord 커뮤니티에서 도움을 받으세요.</p>
       </div>
     </div>
   `,
@@ -905,9 +958,6 @@ function getExcerpt(id) {
     webhooks: '실시간 이벤트 웹훅 설정 및 서명 검증.',
     changelog: '버전별 변경 사항 및 업데이트 내역.',
     faq: '자주 묻는 질문에 대한 답변 모음.',
-    'dream-note': '꿈을 기록하고 패턴과 감정을 분석하는 꿈 일기.',
-    'gratitude-journal': '매일 감사한 일 3가지를 기록하는 감사 일기.',
-    'pdf-library': 'PDF 파일을 업로드하고 브라우저에서 바로 읽는 PDF 도서관.',
   };
   return excerpts[id] || '';
 }
@@ -970,18 +1020,11 @@ function navigate(pageId) {
     renderTOC();
     bindContentLinks();
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    // Run per-page init
-    if (pageId === 'dream-note') {
-      renderDreamList();
-      initGratitudeDates();
-    } else if (pageId === 'gratitude-journal') {
-      renderGratitudeList();
-      initGratitudeDates();
-    } else if (pageId === 'pdf-library') {
-      renderPdfLibrary();
-      initPdfDrop();
-    }
-    // Inject mobile workspace-back strip for template/note pages
+    // Per-page init
+    if (pageId === 'pdf-library')  { setTimeout(() => { renderPdfLibrary(); initPdfDrop(); }, 0); }
+    if (pageId === 'dream-note')   { setTimeout(() => initDreamNote(), 0); }
+    if (pageId === 'gratitude')    { setTimeout(() => initGratitude(), 0); }
+    if (pageId === 'drawing')      { setTimeout(() => initDrawing(), 0); }
     injectMobileBackStrip(pageId);
   }
 }
@@ -1723,7 +1766,7 @@ document.addEventListener('keydown', (e) => {
 
 // ========== MOBILE: WORKSPACE BACK STRIP ==========
 // Pages that are "deep" and need a back-to-workspace top strip on mobile
-const DEEP_PAGES = new Set(['dream-note','gratitude-journal','pdf-library','editor',
+const DEEP_PAGES = new Set(['editor',
   'time-tracking','projects','reports','configuration','integrations',
   'api-overview','authentication','endpoints','webhooks','changelog','faq',
   'installation','quickstart','introduction','core-concepts']);
@@ -1793,7 +1836,6 @@ function updateMobileNav(pageId) {
     configuration: 'home', integrations: 'home', 'api-overview': 'home',
     authentication: 'home', endpoints: 'home', webhooks: 'home', changelog: 'home', faq: 'home',
     editor: 'editor',
-    'dream-note': 'dream-note', 'gratitude-journal': 'dream-note', 'pdf-library': 'dream-note',
   };
   const activeTab = tabMap[pageId] || 'home';
   document.querySelectorAll('.mbn-btn').forEach(b => {
@@ -1855,9 +1897,6 @@ backBtn.addEventListener('click', () => {
     renderTOC();
     bindContentLinks();
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (prev === 'dream-note') { renderDreamList(); initGratitudeDates(); }
-    else if (prev === 'gratitude-journal') { renderGratitudeList(); initGratitudeDates(); }
-    else if (prev === 'pdf-library') { renderPdfLibrary(); initPdfDrop(); }
   }
 });
 
@@ -2315,6 +2354,76 @@ function deleteGratitudeEntry(id) {
 window.deleteGratitudeEntry = deleteGratitudeEntry;
 
 // ========== PDF LIBRARY ==========
+let _pdfActiveFolderId = 'all';
+let _pdfJsDoc = null;
+let _pdfCurrentPage = 1;
+let _pdfTotalPages = 1;
+let _pdfZoom = 1.0;
+let _pdfCurrentId = null;
+let _pdfDrawTool = 'none'; // 'none' | 'pen' | 'highlight' | 'eraser'
+let _pdfDrawing = false;
+let _pdfLastX = 0;
+let _pdfLastY = 0;
+
+// ---- Folder helpers ----
+function getPdfFolders() { return JSON.parse(localStorage.getItem('bcb-pdf-folders') || '[]'); }
+function savePdfFolders(f) { localStorage.setItem('bcb-pdf-folders', JSON.stringify(f)); }
+
+function showCreateFolderPrompt() {
+  const name = prompt('새 폴더 이름을 입력하세요:');
+  if (!name || !name.trim()) return;
+  const folders = getPdfFolders();
+  folders.push({ id: 'f' + Date.now(), name: name.trim() });
+  savePdfFolders(folders);
+  renderPdfFolderTabs();
+  renderPdfLibrary();
+}
+window.showCreateFolderPrompt = showCreateFolderPrompt;
+
+function deletePdfFolder(id) {
+  if (!confirm('폴더를 삭제하시겠어요? 폴더 안 PDF는 "전체"로 이동됩니다.')) return;
+  const folders = getPdfFolders().filter(f => f.id !== id);
+  savePdfFolders(folders);
+  // Move PDFs in this folder to root
+  const list = JSON.parse(localStorage.getItem('bcb-pdf-meta') || '[]');
+  list.forEach(p => { if (p.folderId === id) delete p.folderId; });
+  localStorage.setItem('bcb-pdf-meta', JSON.stringify(list));
+  if (_pdfActiveFolderId === id) _pdfActiveFolderId = 'all';
+  renderPdfFolderTabs();
+  renderPdfLibrary();
+}
+window.deletePdfFolder = deletePdfFolder;
+
+function renderPdfFolderTabs() {
+  const tabs = document.getElementById('pdfFolderTabs');
+  if (!tabs) return;
+  const folders = getPdfFolders();
+  const list = JSON.parse(localStorage.getItem('bcb-pdf-meta') || '[]');
+  const allCount = list.length;
+  const makeTab = (id, label, count, deletable) => {
+    const active = _pdfActiveFolderId === id;
+    return `<button onclick="setPdfFolder(${JSON.stringify(id)})"
+      style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:.8rem;font-weight:600;cursor:pointer;border:1.5px solid ${active ? 'var(--accent)' : 'var(--border)'};background:${active ? 'var(--accent-light)' : 'var(--bg-secondary)'};color:${active ? 'var(--accent-text)' : 'var(--text-muted)'};transition:all .15s">
+      ${label} <span style="font-size:.7rem;background:${active ? 'var(--accent)' : 'var(--border)'};color:${active ? 'white' : 'var(--text-faint)'};border-radius:10px;padding:1px 6px">${count}</span>
+      ${deletable ? `<span onclick="event.stopPropagation();deletePdfFolder(${JSON.stringify(id)})" style="margin-left:2px;opacity:.5;font-size:.85rem">×</span>` : ''}
+    </button>`;
+  };
+  tabs.innerHTML = makeTab('all', '📚 전체', allCount, false)
+    + folders.map(f => {
+        const cnt = list.filter(p => p.folderId === f.id).length;
+        return makeTab(f.id, '📁 ' + f.name, cnt, true);
+      }).join('');
+}
+window.renderPdfFolderTabs = renderPdfFolderTabs;
+
+function setPdfFolder(id) {
+  _pdfActiveFolderId = id;
+  renderPdfFolderTabs();
+  renderPdfLibrary();
+}
+window.setPdfFolder = setPdfFolder;
+
+// ---- Upload ----
 function handlePdfUpload(input) {
   const files = [...input.files];
   const stored = JSON.parse(localStorage.getItem('bcb-pdf-meta') || '[]');
@@ -2322,71 +2431,89 @@ function handlePdfUpload(input) {
     const reader = new FileReader();
     reader.onload = (e) => {
       const entry = {
-        id: Date.now() + Math.random(),
+        id: 'p' + Date.now() + Math.random().toString(36).slice(2),
         name: file.name,
         size: file.size,
         dataUrl: e.target.result,
         addedAt: new Date().toISOString(),
+        folderId: _pdfActiveFolderId !== 'all' ? _pdfActiveFolderId : undefined,
       };
       stored.unshift(entry);
       localStorage.setItem('bcb-pdf-meta', JSON.stringify(stored));
+      renderPdfFolderTabs();
       renderPdfLibrary();
     };
     reader.readAsDataURL(file);
   });
-  input.value = '';
+  if (input.value !== undefined) input.value = '';
 }
 window.handlePdfUpload = handlePdfUpload;
 
+// ---- Move PDF to folder ----
+function movePdfToFolder(pdfId) {
+  const folders = getPdfFolders();
+  if (!folders.length) { alert('폴더를 먼저 만들어주세요.'); return; }
+  const opts = folders.map((f, i) => `${i+1}. ${f.name}`).join('\n');
+  const ans = prompt(`이동할 폴더 번호를 입력하세요 (0=전체):\n0. 전체\n${opts}`);
+  if (ans === null) return;
+  const idx = parseInt(ans);
+  const list = JSON.parse(localStorage.getItem('bcb-pdf-meta') || '[]');
+  const p = list.find(x => x.id === pdfId);
+  if (!p) return;
+  if (idx === 0) { delete p.folderId; }
+  else if (folders[idx - 1]) { p.folderId = folders[idx - 1].id; }
+  else return;
+  localStorage.setItem('bcb-pdf-meta', JSON.stringify(list));
+  renderPdfFolderTabs();
+  renderPdfLibrary();
+}
+window.movePdfToFolder = movePdfToFolder;
+
+// ---- Render grid ----
 function renderPdfLibrary() {
   const grid = document.getElementById('pdfGrid');
   if (!grid) return;
-  const list = JSON.parse(localStorage.getItem('bcb-pdf-meta') || '[]');
+  renderPdfFolderTabs();
+  const allList = JSON.parse(localStorage.getItem('bcb-pdf-meta') || '[]');
+  const list = _pdfActiveFolderId === 'all'
+    ? allList
+    : allList.filter(p => p.folderId === _pdfActiveFolderId);
   if (!list.length) {
-    grid.innerHTML = '<p style="color:var(--text-faint);font-size:.9rem">아직 업로드된 PDF가 없습니다.</p>';
+    grid.innerHTML = '<p style="color:var(--text-faint);font-size:.9rem;padding:12px 0">이 폴더에 PDF가 없습니다. 위 버튼으로 추가해보세요.</p>';
     return;
   }
   grid.innerHTML = list.map(p => `
     <div class="pdf-card">
       <div class="pdf-card-icon">📄</div>
       <div class="pdf-card-info">
-        <div class="pdf-card-name">${p.name}</div>
-        <div class="pdf-card-size">${(p.size / 1024).toFixed(1)} KB</div>
+        <div class="pdf-card-name" title="${p.name}">${p.name.length > 28 ? p.name.slice(0,25)+'…' : p.name}</div>
+        <div class="pdf-card-size">${(p.size / 1024).toFixed(0)} KB · ${new Date(p.addedAt).toLocaleDateString()}</div>
       </div>
       <div class="pdf-card-actions">
-        <button class="btn btn-primary" style="padding:6px 12px;font-size:.8rem" onclick="openPdfViewer(${JSON.stringify(p.id)})">열기</button>
-        <button class="btn btn-secondary" style="padding:6px 10px;font-size:.8rem" onclick="deletePdf(${JSON.stringify(p.id)})">삭제</button>
+        <button class="btn btn-primary" style="padding:5px 11px;font-size:.78rem;flex:1" onclick="openPdfViewer(${JSON.stringify(p.id)})">📖 읽기</button>
+        <button class="btn btn-secondary" style="padding:5px 8px;font-size:.78rem" onclick="movePdfToFolder(${JSON.stringify(p.id)})" title="폴더 이동">📁</button>
+        <button class="btn btn-secondary" style="padding:5px 8px;font-size:.78rem;color:#ef4444" onclick="deletePdf(${JSON.stringify(p.id)})" title="삭제">🗑</button>
       </div>
     </div>
   `).join('');
 }
 window.renderPdfLibrary = renderPdfLibrary;
 
-function openPdfViewer(id) {
-  const list = JSON.parse(localStorage.getItem('bcb-pdf-meta') || '[]');
-  const pdf = list.find(p => p.id === id);
-  if (!pdf) return;
-  document.getElementById('pdfViewer').style.display = 'block';
-  document.getElementById('pdfViewerTitle').textContent = pdf.name;
-  document.getElementById('pdfFrame').src = pdf.dataUrl;
-  document.getElementById('pdfViewer').scrollIntoView({ behavior: 'smooth' });
-}
-window.openPdfViewer = openPdfViewer;
-
-function closePdfViewer() {
-  document.getElementById('pdfViewer').style.display = 'none';
-  document.getElementById('pdfFrame').src = '';
-}
-window.closePdfViewer = closePdfViewer;
-
+// ---- Delete ----
 function deletePdf(id) {
+  if (!confirm('이 PDF를 삭제하시겠어요?')) return;
   let list = JSON.parse(localStorage.getItem('bcb-pdf-meta') || '[]');
   list = list.filter(p => p.id !== id);
   localStorage.setItem('bcb-pdf-meta', JSON.stringify(list));
+  // Remove saved annotations
+  const keys = Object.keys(localStorage).filter(k => k.startsWith('bcb-pdf-ann-' + id));
+  keys.forEach(k => localStorage.removeItem(k));
+  renderPdfFolderTabs();
   renderPdfLibrary();
 }
 window.deletePdf = deletePdf;
 
+// ---- Drop zone ----
 function initPdfDrop() {
   const zone = document.getElementById('pdfUploadZone');
   if (!zone) return;
@@ -2397,11 +2524,228 @@ function initPdfDrop() {
     zone.classList.remove('dragover');
     const files = [...e.dataTransfer.files].filter(f => f.type === 'application/pdf');
     if (!files.length) return;
-    const fakeInput = { files, value: '' };
-    handlePdfUpload(fakeInput);
+    handlePdfUpload({ files, value: '' });
   });
 }
 window.initPdfDrop = initPdfDrop;
+
+// ---- PDF.js Viewer ----
+async function openPdfViewer(id) {
+  const list = JSON.parse(localStorage.getItem('bcb-pdf-meta') || '[]');
+  const pdf = list.find(p => p.id === id);
+  if (!pdf) return;
+  _pdfCurrentId = id;
+
+  const modal = document.getElementById('pdfViewerModal');
+  modal.style.display = 'flex';
+  document.getElementById('pdfViewerTitle').textContent = pdf.name;
+
+  // Load PDF.js if needed
+  if (!window.pdfjsLib) {
+    await new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    });
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+
+  // Convert dataUrl to ArrayBuffer
+  const base64 = pdf.dataUrl.split(',')[1];
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+  _pdfJsDoc = await window.pdfjsLib.getDocument({ data: bytes }).promise;
+  _pdfTotalPages = _pdfJsDoc.numPages;
+  _pdfCurrentPage = 1;
+  _pdfZoom = 1.0;
+  document.getElementById('pdfTotalPages').textContent = _pdfTotalPages;
+  document.getElementById('pdfZoomLabel').textContent = '100%';
+
+  await renderPdfPage(_pdfCurrentPage);
+  initPdfDrawCanvas();
+}
+window.openPdfViewer = openPdfViewer;
+
+async function renderPdfPage(pageNum) {
+  if (!_pdfJsDoc) return;
+  _pdfCurrentPage = pageNum;
+  document.getElementById('pdfCurrentPage').textContent = pageNum;
+  document.getElementById('pdfPrevBtn').disabled = pageNum <= 1;
+  document.getElementById('pdfNextBtn').disabled = pageNum >= _pdfTotalPages;
+
+  const page = await _pdfJsDoc.getPage(pageNum);
+  const viewport = page.getViewport({ scale: _pdfZoom * (window.devicePixelRatio || 1) });
+  const canvas = document.getElementById('pdfRenderCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+  canvas.style.width = Math.round(viewport.width / (window.devicePixelRatio || 1)) + 'px';
+  canvas.style.height = Math.round(viewport.height / (window.devicePixelRatio || 1)) + 'px';
+  await page.render({ canvasContext: ctx, viewport }).promise;
+
+  // Resize draw canvas to match
+  const drawCanvas = document.getElementById('pdfDrawCanvas');
+  drawCanvas.width = canvas.width;
+  drawCanvas.height = canvas.height;
+  drawCanvas.style.width = canvas.style.width;
+  drawCanvas.style.height = canvas.style.height;
+
+  // Restore saved annotation for this page
+  const annKey = 'bcb-pdf-ann-' + _pdfCurrentId + '-' + pageNum;
+  const saved = localStorage.getItem(annKey);
+  if (saved) {
+    const img = new Image();
+    img.onload = () => drawCanvas.getContext('2d').drawImage(img, 0, 0);
+    img.src = saved;
+  } else {
+    drawCanvas.getContext('2d').clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+  }
+}
+
+async function pdfPrevPage() { if (_pdfCurrentPage > 1) await renderPdfPage(_pdfCurrentPage - 1); }
+async function pdfNextPage() { if (_pdfCurrentPage < _pdfTotalPages) await renderPdfPage(_pdfCurrentPage + 1); }
+window.pdfPrevPage = pdfPrevPage;
+window.pdfNextPage = pdfNextPage;
+
+async function pdfZoom(delta) {
+  _pdfZoom = Math.max(0.4, Math.min(3.0, _pdfZoom + delta));
+  document.getElementById('pdfZoomLabel').textContent = Math.round(_pdfZoom * 100) + '%';
+  await renderPdfPage(_pdfCurrentPage);
+}
+window.pdfZoom = pdfZoom;
+
+function closePdfViewer() {
+  document.getElementById('pdfViewerModal').style.display = 'none';
+  _pdfJsDoc = null; _pdfCurrentId = null;
+}
+window.closePdfViewer = closePdfViewer;
+
+// ---- Drawing on PDF ----
+function initPdfDrawCanvas() {
+  const canvas = document.getElementById('pdfDrawCanvas');
+  if (!canvas) return;
+  // Remove old listeners by replacing element clone — simple approach with flags
+  canvas._drawInit = true;
+  canvas.onmousedown = (e) => {
+    if (_pdfDrawTool === 'none') return;
+    _pdfDrawing = true;
+    const r = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / r.width;
+    const scaleY = canvas.height / r.height;
+    _pdfLastX = (e.clientX - r.left) * scaleX;
+    _pdfLastY = (e.clientY - r.top) * scaleY;
+    if (_pdfDrawTool === 'eraser') {
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(_pdfLastX - 15, _pdfLastY - 15, 30, 30);
+    }
+  };
+  canvas.onmousemove = (e) => {
+    if (!_pdfDrawing) return;
+    const r = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / r.width;
+    const scaleY = canvas.height / r.height;
+    const x = (e.clientX - r.left) * scaleX;
+    const y = (e.clientY - r.top) * scaleY;
+    const ctx = canvas.getContext('2d');
+    const color = document.getElementById('pdfDrawColor').value;
+    const size = parseInt(document.getElementById('pdfDrawSize').value);
+    if (_pdfDrawTool === 'pen') {
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = color; ctx.lineWidth = size;
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.beginPath(); ctx.moveTo(_pdfLastX, _pdfLastY);
+      ctx.lineTo(x, y); ctx.stroke();
+    } else if (_pdfDrawTool === 'highlight') {
+      ctx.globalAlpha = 0.35;
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = color; ctx.lineWidth = size * 6;
+      ctx.lineCap = 'square'; ctx.lineJoin = 'round';
+      ctx.beginPath(); ctx.moveTo(_pdfLastX, _pdfLastY);
+      ctx.lineTo(x, y); ctx.stroke();
+      ctx.globalAlpha = 1;
+    } else if (_pdfDrawTool === 'eraser') {
+      ctx.clearRect(x - 15, y - 15, 30, 30);
+    }
+    _pdfLastX = x; _pdfLastY = y;
+  };
+  canvas.onmouseup = canvas.onmouseleave = () => { _pdfDrawing = false; };
+
+  // Touch support
+  canvas.ontouchstart = (e) => {
+    if (_pdfDrawTool === 'none') return;
+    e.preventDefault();
+    const t = e.touches[0];
+    const r = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / r.width;
+    const scaleY = canvas.height / r.height;
+    _pdfDrawing = true;
+    _pdfLastX = (t.clientX - r.left) * scaleX;
+    _pdfLastY = (t.clientY - r.top) * scaleY;
+  };
+  canvas.ontouchmove = (e) => {
+    if (!_pdfDrawing) return;
+    e.preventDefault();
+    const t = e.touches[0];
+    const r = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / r.width;
+    const scaleY = canvas.height / r.height;
+    const x = (t.clientX - r.left) * scaleX;
+    const y = (t.clientY - r.top) * scaleY;
+    const ctx = canvas.getContext('2d');
+    const color = document.getElementById('pdfDrawColor').value;
+    const size = parseInt(document.getElementById('pdfDrawSize').value);
+    if (_pdfDrawTool === 'pen') {
+      ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = color; ctx.lineWidth = size;
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.beginPath(); ctx.moveTo(_pdfLastX, _pdfLastY);
+      ctx.lineTo(x, y); ctx.stroke();
+    } else if (_pdfDrawTool === 'highlight') {
+      ctx.globalAlpha = 0.35; ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = color; ctx.lineWidth = size * 6;
+      ctx.lineCap = 'square';
+      ctx.beginPath(); ctx.moveTo(_pdfLastX, _pdfLastY);
+      ctx.lineTo(x, y); ctx.stroke();
+      ctx.globalAlpha = 1;
+    } else if (_pdfDrawTool === 'eraser') {
+      ctx.clearRect(x - 15, y - 15, 30, 30);
+    }
+    _pdfLastX = x; _pdfLastY = y;
+  };
+  canvas.ontouchend = () => { _pdfDrawing = false; };
+}
+
+function setPdfTool(tool) {
+  _pdfDrawTool = tool;
+  ['none','pen','highlight','eraser'].forEach(t => {
+    const btn = document.getElementById('pdfTool' + t.charAt(0).toUpperCase() + t.slice(1));
+    if (btn) btn.classList.toggle('active', t === tool);
+  });
+  const drawCanvas = document.getElementById('pdfDrawCanvas');
+  if (drawCanvas) drawCanvas.style.cursor = tool === 'none' ? 'default' : 'crosshair';
+}
+window.setPdfTool = setPdfTool;
+
+function clearPdfCanvas() {
+  const canvas = document.getElementById('pdfDrawCanvas');
+  if (canvas) canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+}
+window.clearPdfCanvas = clearPdfCanvas;
+
+function savePdfAnnotation() {
+  const canvas = document.getElementById('pdfDrawCanvas');
+  if (!canvas || !_pdfCurrentId) return;
+  const annKey = 'bcb-pdf-ann-' + _pdfCurrentId + '-' + _pdfCurrentPage;
+  localStorage.setItem(annKey, canvas.toDataURL());
+  const btn = document.querySelector('[onclick="savePdfAnnotation()"]');
+  if (btn) { btn.textContent = '✓ 저장됨'; setTimeout(() => { btn.textContent = '저장'; }, 1500); }
+}
+window.savePdfAnnotation = savePdfAnnotation;
 
 // ========== CUSTOM THEME ==========
 const customThemeBtn = document.getElementById('customThemeBtn');
@@ -2544,9 +2888,111 @@ function showToast(msg) {
   }, 2500);
 }
 
+// ========== DRAWING INIT ==========
+function initDrawing() {
+  const canvas = document.getElementById('pageDrawCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let drawing = false, tool = 'pen', color = '#3b82f6', size = 4;
+  let last = null;
+
+  function resize() {
+    const saved = canvas.toDataURL();
+    canvas.width = canvas.parentElement.offsetWidth || window.innerWidth;
+    canvas.height = Math.max(500, window.innerHeight - 200);
+    const img = new Image(); img.src = saved;
+    img.onload = () => ctx.drawImage(img, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function pos(e) {
+    const r = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x: (src.clientX - r.left) * (canvas.width / r.width), y: (src.clientY - r.top) * (canvas.height / r.height) };
+  }
+  function start(e) { e.preventDefault(); drawing = true; last = pos(e); }
+  function move(e) {
+    e.preventDefault();
+    if (!drawing) return;
+    const p = pos(e);
+    ctx.beginPath();
+    ctx.strokeStyle = tool === 'eraser' ? 'rgba(0,0,0,0)' : color;
+    if (tool === 'eraser') {
+      ctx.clearRect(p.x - size*3, p.y - size*3, size*6, size*6);
+    } else if (tool === 'highlight') {
+      ctx.globalAlpha = 0.3;
+      ctx.lineWidth = size * 4;
+      ctx.strokeStyle = color;
+      ctx.lineCap = 'square';
+      ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke();
+      ctx.globalAlpha = 1;
+    } else {
+      ctx.lineWidth = size; ctx.lineCap = 'round';
+      ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke();
+    }
+    last = p;
+  }
+  function end() { drawing = false; last = null; }
+
+  canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', move);
+  canvas.addEventListener('mouseup', end); canvas.addEventListener('mouseleave', end);
+  canvas.addEventListener('touchstart', start, {passive:false});
+  canvas.addEventListener('touchmove', move, {passive:false});
+  canvas.addEventListener('touchend', end);
+
+  // Toolbar buttons
+  document.querySelectorAll('[data-draw-tool]').forEach(btn => {
+    btn.addEventListener('click', () => { tool = btn.dataset.drawTool; document.querySelectorAll('[data-draw-tool]').forEach(b => b.classList.remove('active')); btn.classList.add('active'); });
+  });
+  const colorPicker = document.getElementById('drawColor');
+  if (colorPicker) colorPicker.addEventListener('input', e => { color = e.target.value; });
+  const sizePicker = document.getElementById('drawSize');
+  if (sizePicker) sizePicker.addEventListener('input', e => { size = +e.target.value; });
+  const clearBtn = document.getElementById('drawClear');
+  if (clearBtn) clearBtn.addEventListener('click', () => ctx.clearRect(0, 0, canvas.width, canvas.height));
+  const saveBtn = document.getElementById('drawSave');
+  if (saveBtn) saveBtn.addEventListener('click', () => {
+    const a = document.createElement('a');
+    a.download = 'drawing-' + Date.now() + '.png';
+    a.href = canvas.toDataURL(); a.click();
+    showToast('이미지로 저장했어요!');
+  });
+}
+window.initDrawing = initDrawing;
+
+// ========== DREAM NOTE INIT ==========
+function initDreamNote() {
+  const dateInput = document.getElementById('dreamDate');
+  if (dateInput && !dateInput.value) dateInput.value = new Date().toISOString().slice(0,10);
+  renderDreamList();
+}
+window.initDreamNote = initDreamNote;
+
+// ========== GRATITUDE INIT ==========
+function initGratitude() {
+  const dateInput = document.getElementById('gratDate');
+  if (dateInput && !dateInput.value) dateInput.value = new Date().toISOString().slice(0,10);
+  renderGratitudeList();
+}
+window.initGratitude = initGratitude;
+
+// ========== EMBED MODE (워크스페이스 iframe용) ==========
+(function() {
+  const params = new URLSearchParams(location.search);
+  if (params.get('embed') === '1') {
+    document.documentElement.classList.add('embed-mode');
+    const style = document.createElement('style');
+    style.textContent = `.embed-mode .site-header,.embed-mode .sidebar,.embed-mode .sidebar-overlay,.embed-mode .mobile-bottom-nav,.embed-mode .mobile-nav-bar{display:none!important}.embed-mode .layout{margin-top:0!important;min-height:100vh}.embed-mode .content{padding-top:0}`;
+    document.head.appendChild(style);
+  }
+})();
+
 // ========== INIT ==========
-navigate('home');
-updateMobileNav('home');
+const _initPage = new URLSearchParams(location.search).get('page') || location.hash.replace('#','') || 'home';
+const _validPage = PAGES.find(p => p.id === _initPage) ? _initPage : 'home';
+navigate(_validPage);
+updateMobileNav(_validPage);
 
 // Open first folder by default
 const firstFolder = document.querySelector('.has-children');

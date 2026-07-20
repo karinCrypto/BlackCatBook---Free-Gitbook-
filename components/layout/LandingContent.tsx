@@ -18,25 +18,29 @@ export default function LandingContent() {
 
   return (
     <>
-      <section className="flex flex-col items-center justify-center text-center pt-40 pb-24 px-6">
+      {/* 히어로 — 아기 검은고양이 사진의 소프트 핑크 + 블랙 톤 */}
+      <section className="flex flex-col items-center justify-center text-center pt-36 pb-20 px-6"
+        style={{ background: 'linear-gradient(180deg, #FFD9DF 0%, #FFE6EA 68%, var(--bg) 100%)' }}>
+        <img src="/logo.png" alt="BlackCatBook 로고"
+          style={{ width: 132, height: 132, objectFit: 'contain', marginBottom: 20, borderRadius: 32, boxShadow: '0 18px 44px rgba(31,17,20,0.18)' }} />
         <div className="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full mb-6"
-          style={{ background: 'var(--accent-light)', color: 'var(--accent-text)', border: '1px solid var(--border)' }}>
+          style={{ background: 'rgba(255,255,255,0.72)', color: '#B34557', border: '1px solid rgba(31,17,20,0.10)' }}>
           {tr('landing.badge')}
         </div>
-        <h1 className="text-5xl md:text-6xl font-black mb-6 leading-tight" style={{ color: 'var(--text)' }}>
+        <h1 className="text-5xl md:text-6xl font-black mb-6 leading-tight" style={{ color: '#1F1114' }}>
           {tr('landing.hero.title1')}<br />
-          <span style={{ color: 'var(--accent)' }}>BlackCatBook</span>
+          <span style={{ color: '#E85D75' }}>BlackCatBook</span>
         </h1>
-        <p className="text-xl max-w-2xl mb-10 whitespace-pre-line" style={{ color: 'var(--text-muted)' }}>
+        <p className="text-xl max-w-2xl mb-10 whitespace-pre-line" style={{ color: '#6B4C52' }}>
           {tr('landing.hero.desc')}
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
           <Link href="/dashboard" className="px-8 py-4 rounded-xl text-base font-bold transition-all hover:scale-105"
-            style={{ background: 'var(--accent)', color: 'white', boxShadow: 'var(--shadow-lg)' }}>
+            style={{ background: '#1F1114', color: '#FFD9DF', boxShadow: '0 12px 30px rgba(31,17,20,0.25)' }}>
             {tr('landing.cta.start')}
           </Link>
           <Link href="/login" className="px-8 py-4 rounded-xl text-base font-semibold"
-            style={{ background: 'var(--bg-secondary)', color: 'var(--text)', border: '1px solid var(--border)' }}>
+            style={{ background: 'rgba(255,255,255,0.8)', color: '#1F1114', border: '1px solid rgba(31,17,20,0.12)' }}>
             {tr('common.login')}
           </Link>
         </div>
@@ -60,7 +64,7 @@ export default function LandingContent() {
       <section className="text-center pb-24 px-6">
         <div className="inline-block p-10 rounded-3xl max-w-lg w-full"
           style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
-          <div className="text-4xl mb-4">🦇</div>
+          <div className="text-4xl mb-4">🐈‍⬛</div>
           <h2 className="text-2xl font-black mb-3" style={{ color: 'var(--text)' }}>{tr('landing.cta2.title')}</h2>
           <p className="mb-6 text-sm" style={{ color: 'var(--text-muted)' }}>{tr('landing.cta2.desc')}</p>
           <Link href="/dashboard" className="block w-full py-3 rounded-xl font-bold text-center transition-all hover:opacity-90"
