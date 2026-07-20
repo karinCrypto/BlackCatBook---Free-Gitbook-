@@ -11,6 +11,7 @@ import ShareModal from '@/components/workspace/ShareModal'
 import AIWritePanel from '@/components/editor/AIWritePanel'
 import PdfLibraryPage from '@/components/pdf/PdfLibraryPage'
 import FontSizeControl from '@/components/layout/FontSizeControl'
+import { usePlan, FREE_LIMITS } from '@/lib/firebase/premium'
 import type { Page } from '@/lib/localStorage/pages'
 
 const THEMES = [
@@ -24,6 +25,7 @@ const THEMES = [
 export default function WorkspacePage() {
   const { workspaceId } = useParams<{ workspaceId: string }>()
   const router = useRouter()
+  const { plan } = usePlan()
   const { pages, tree, createPage, updatePage, deletePage, duplicatePage, reorderPages, movePage } = usePages(workspaceId)
   const [wsName, setWsName] = useState('')
   const [currentPageId, setCurrentPageId] = useState<string|null>(null)
@@ -72,6 +74,10 @@ export default function WorkspacePage() {
   const currentPage = pages.find(p => p.id === currentPageId) ?? null
 
   function handleCreatePage(parentId: string|null, type: 'page'|'folder'): string {
+    if (plan === 'free' && pages.filter(p => p.type === 'page').length >= FREE_LIMITS.pagesPerWorkspace) {
+      if (confirm(`무료 플랜은 워크스페이스당 문서 ${FREE_LIMITS.pagesPerWorkspace}개까지 만들 수 있어요.\n프리미엄으로 업그레이드하시겠어요?`)) router.push('/pricing')
+      return ''
+    }
     const order = pages.filter(p => p.parentId === parentId).length
     const p = createPage({
       workspaceId, parentId, type, order,
