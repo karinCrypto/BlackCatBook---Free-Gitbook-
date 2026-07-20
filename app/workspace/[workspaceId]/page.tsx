@@ -12,6 +12,7 @@ import AIWritePanel from '@/components/editor/AIWritePanel'
 import PdfLibraryPage from '@/components/pdf/PdfLibraryPage'
 import FontSizeControl from '@/components/layout/FontSizeControl'
 import { usePlan, FREE_LIMITS } from '@/lib/firebase/premium'
+import { NOTE_TEMPLATES, type NoteTemplate } from '@/lib/templates'
 import type { Page } from '@/lib/localStorage/pages'
 
 const THEMES = [
@@ -36,6 +37,7 @@ export default function WorkspacePage() {
   const [isEditing, setIsEditing] = useState(false)
   const [shareOpen, setShareOpen] = useState(false)
   const [aiPanelOpen, setAiPanelOpen] = useState(false)
+  const [templateModal, setTemplateModal] = useState(false)
   type FeatureView = 'pages' | 'pdf-library' | 'dream-note' | 'gratitude' | 'drawing'
   const [activeView, setActiveView] = useState<FeatureView>('pages')
   const fileImportRef = useRef<HTMLInputElement>(null)
@@ -86,6 +88,19 @@ export default function WorkspacePage() {
     })
     if (type === 'page') { setCurrentPageId(p.id); setIsEditing(true) }
     return p.id
+  }
+
+  function handleCreateFromTemplate(t: NoteTemplate) {
+    if (plan === 'free' && pages.filter(p => p.type === 'page').length >= FREE_LIMITS.pagesPerWorkspace) {
+      setTemplateModal(false)
+      if (confirm(`무료 플랜은 워크스페이스당 문서 ${FREE_LIMITS.pagesPerWorkspace}개까지 만들 수 있어요.\n프리미엄으로 업그레이드하시겠어요?`)) router.push('/pricing')
+      return
+    }
+    const order = pages.filter(p => p.parentId === null).length
+    const p = createPage({ workspaceId, parentId: null, type: 'page', order, title: t.title, content: t.html })
+    setTemplateModal(false)
+    setCurrentPageId(p.id)
+    setIsEditing(true)
   }
 
   function handleDelete(id: string) {
@@ -215,6 +230,12 @@ export default function WorkspacePage() {
         <span className="ws-header-wsname" style={{ fontSize:'0.875rem', color:'var(--text-muted)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:180 }}>{wsName}</span>
 
         <div style={{ marginLeft:'auto', display:'flex', gap:6, alignItems:'center' }}>
+          <button onClick={() => setTemplateModal(true)} title="노트 템플릿"
+            style={{ display:'flex', alignItems:'center', gap:5, padding:'6px 12px', borderRadius:8,
+              border:'1px solid var(--border)', background:'var(--bg-tertiary)', color:'var(--text)',
+              cursor:'pointer', fontSize:'0.78rem', fontWeight:700, whiteSpace:'nowrap' }}>
+            📑 템플릿
+          </button>
           <FontSizeControl />
           {/* Export — desktop only */}
           <button onClick={handleExport} title="내보내기" className="md-show"
@@ -470,6 +491,39 @@ export default function WorkspacePage() {
           workspaceName={wsName}
           onClose={() => setShareOpen(false)}
         />
+      )}
+
+      {/* TEMPLATE GALLERY MODAL */}
+      {templateModal && (
+        <div onClick={() => setTemplateModal(false)}
+          style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.55)', zIndex:200,
+            display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}>
+          <div onClick={e => e.stopPropagation()}
+            style={{ width:'100%', maxWidth:640, maxHeight:'82vh', overflowY:'auto', borderRadius:20,
+              background:'var(--bg-secondary)', border:'1px solid var(--border)', padding:24 }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:6 }}>
+              <div style={{ fontWeight:900, fontSize:'1.1rem', color:'var(--text)' }}>📑 노트 템플릿</div>
+              <button onClick={() => setTemplateModal(false)}
+                style={{ background:'none', border:'none', cursor:'pointer', color:'var(--text-muted)', fontSize:20 }}>×</button>
+            </div>
+            <div style={{ fontSize:'0.8rem', color:'var(--text-muted)', marginBottom:16 }}>
+              고르면 그 구조의 새 페이지가 바로 만들어져요.
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(180px,1fr))', gap:10 }}>
+              {NOTE_TEMPLATES.map(t => (
+                <button key={t.id} onClick={() => handleCreateFromTemplate(t)}
+                  style={{ padding:'16px 14px', borderRadius:14, textAlign:'left', cursor:'pointer',
+                    border:'1.5px solid var(--border)', background:'var(--bg)', transition:'border-color .15s' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--accent)' }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)' }}>
+                  <div style={{ fontSize:26, marginBottom:8 }}>{t.emoji}</div>
+                  <div style={{ fontWeight:800, fontSize:'0.88rem', color:'var(--text)', marginBottom:3 }}>{t.label}</div>
+                  <div style={{ fontSize:'0.72rem', color:'var(--text-muted)', lineHeight:1.5 }}>{t.desc}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
