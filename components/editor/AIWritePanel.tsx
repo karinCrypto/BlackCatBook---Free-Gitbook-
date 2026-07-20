@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
+import { DOC_TYPES, TONES, transform, generateSeo, type DocType, type Tone } from '@/lib/freeFormat'
 
 type Props = {
   onInsert: (html: string) => void
@@ -69,6 +70,11 @@ const PROVIDERS: { id: Provider; label: string; color: string; keyPrefix: string
 const STORAGE_PREFIX = 'bcb-ai-key-'
 
 export default function AIWritePanel({ onInsert, onClose }: Props) {
+  const [mode, setMode] = useState<'free' | 'api'>('free')
+  const [freeText, setFreeText] = useState('')
+  const [freeType, setFreeType] = useState<DocType>('blog')
+  const [freeTone, setFreeTone] = useState<Tone>('clean')
+  const [freeMsg, setFreeMsg] = useState('')
   const [provider, setProvider] = useState<Provider>('anthropic')
   const [apiKeys, setApiKeys] = useState<Record<Provider, string>>({ anthropic: '', openai: '', gemini: '' })
   const [savedKeys, setSavedKeys] = useState<Record<Provider, boolean>>({ anthropic: false, openai: false, gemini: false })
@@ -175,6 +181,95 @@ export default function AIWritePanel({ onInsert, onClose }: Props) {
           style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 20, lineHeight: 1 }}>×</button>
       </div>
 
+      {/* 모드 탭: 무료 즉시 편집(기본) / API 모드 */}
+      <div style={{ display: 'flex', gap: 6, padding: '12px 18px 0' }}>
+        {([['free', '🆓 즉시 편집 (무료)'], ['api', '🔑 AI 생성 (API)']] as const).map(([m, label]) => (
+          <button key={m} onClick={() => setMode(m)}
+            style={{ flex: 1, padding: '9px 6px', borderRadius: 9, cursor: 'pointer', fontWeight: 700, fontSize: '0.78rem',
+              border: mode === m ? '1.5px solid var(--accent)' : '1.5px solid var(--border)',
+              background: mode === m ? 'var(--accent-light)' : 'var(--bg)',
+              color: mode === m ? 'var(--accent-text)' : 'var(--text-muted)' }}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {mode === 'free' && (
+        <div style={{ padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
+          <div style={{ padding: '10px 12px', borderRadius: 9, background: 'var(--accent-light)', fontSize: '0.75rem', color: 'var(--accent-text)', lineHeight: 1.6 }}>
+            API 키·토큰 없이 <strong>브라우저에서 즉시</strong> 서식을 입혀요. 글을 붙여넣고 종류만 고르면 끝!
+          </div>
+          <div>
+            <label style={labelStyle}>📄 원본 글 붙여넣기 *</label>
+            <textarea value={freeText} onChange={e => { setFreeText(e.target.value); setFreeMsg('') }}
+              placeholder={'메모, 초안, 아무 글이나 붙여넣으세요.\n첫 줄은 제목으로 인식돼요.'}
+              rows={7}
+              style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.6, marginTop: 6, fontFamily: 'inherit' }} />
+          </div>
+          <div>
+            <label style={labelStyle}>📚 글 종류</label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginTop: 6 }}>
+              {DOC_TYPES.map(t => (
+                <button key={t.id} onClick={() => setFreeType(t.id)}
+                  style={{ padding: '8px 10px', borderRadius: 8, textAlign: 'left', cursor: 'pointer',
+                    border: freeType === t.id ? '1.5px solid var(--accent)' : '1.5px solid var(--border)',
+                    background: freeType === t.id ? 'var(--accent-light)' : 'var(--bg)' }}>
+                  <div style={{ fontSize: '0.78rem', fontWeight: 700, color: freeType === t.id ? 'var(--accent-text)' : 'var(--text)' }}>{t.label}</div>
+                  <div style={{ fontSize: '0.66rem', color: 'var(--text-muted)', marginTop: 1 }}>{t.desc}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label style={labelStyle}>🎨 톤 (글의 이미지)</label>
+            <div style={{ display: 'flex', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
+              {TONES.map(t => (
+                <button key={t.id} onClick={() => setFreeTone(t.id)}
+                  style={{ flex: 1, minWidth: 76, padding: '7px 4px', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: '0.75rem',
+                    border: freeTone === t.id ? '1.5px solid var(--accent)' : '1.5px solid var(--border)',
+                    background: freeTone === t.id ? 'var(--accent-light)' : 'var(--bg)',
+                    color: freeTone === t.id ? 'var(--accent-text)' : 'var(--text)' }}>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          {freeMsg && (
+            <div style={{ padding: '9px 12px', borderRadius: 8, background: freeMsg.startsWith('✅') ? '#f0fdf4' : '#fef2f2',
+              color: freeMsg.startsWith('✅') ? '#16a34a' : '#dc2626', fontSize: '0.8rem' }}>{freeMsg}</div>
+          )}
+          <button onClick={() => {
+            if (!freeText.trim()) { setFreeMsg('변환할 글을 먼저 붙여넣어 주세요.'); return }
+            onInsert(transform(freeText, freeType, freeTone))
+            setFreeMsg('✅ 문서에 삽입됐어요! (토큰 0개 사용)')
+          }}
+            style={{ padding: '13px', borderRadius: 10, border: 'none', cursor: 'pointer',
+              background: 'var(--accent)', color: 'white', fontWeight: 800, fontSize: '0.95rem' }}>
+            ✨ 이 스타일로 즉시 편집
+          </button>
+          <button onClick={() => {
+            if (!freeText.trim()) { setFreeMsg('분석할 글을 먼저 붙여넣어 주세요.'); return }
+            const esc2 = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            const seo = generateSeo(freeText)
+            onInsert([
+              '<h2>🔍 SEO 메타태그</h2>',
+              `<pre><code>${esc2(seo.metaHtml)}</code></pre>`,
+              '<h2>🧩 JSON-LD 스키마</h2>',
+              `<pre><code>${esc2(seo.jsonLd)}</code></pre>`,
+              '<h2>🎯 GEO 추천 키워드 (AI 검색 최적화)</h2>',
+              `<ul>${seo.geoKeywords.map(k => `<li>${esc2(k)}</li>`).join('')}</ul>`,
+              `<p>일반 키워드: ${seo.keywords.map(k => `#${esc2(k)}`).join(' ')}</p>`,
+            ].join('\n'))
+            setFreeMsg('✅ SEO/GEO 블록이 문서에 삽입됐어요!')
+          }}
+            style={{ padding: '11px', borderRadius: 10, cursor: 'pointer',
+              background: 'var(--bg)', color: 'var(--text)', border: '1.5px solid var(--border)', fontWeight: 700, fontSize: '0.85rem' }}>
+            🔍 SEO 메타 + JSON-LD + GEO 키워드 생성
+          </button>
+        </div>
+      )}
+
+      {mode === 'api' && (
       <div style={{ padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
 
         {/* Provider selector */}
@@ -373,6 +468,7 @@ export default function AIWritePanel({ onInsert, onClose }: Props) {
         </div>
 
       </div>
+      )}
     </div>
   )
 }
