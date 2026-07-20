@@ -52,6 +52,7 @@ export default function DashboardPage() {
   const [wsEmoji, setWsEmoji] = useState('📖')
   const [emojiPicker, setEmojiPicker] = useState(false)
   const [sort, setSort] = useState<Sort>('recent')
+  const [folderFilter, setFolderFilter] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [themePanel, setThemePanel] = useState(false)
   const [activeTheme, setActiveTheme] = useState('midnight')
@@ -111,7 +112,19 @@ export default function DashboardPage() {
 
   function handleTheme(t: string) { setTheme(t); setActiveTheme(t); setThemePanel(false) }
 
+  const folders = [...new Set(workspaces.map(w => w.folder).filter(Boolean))].sort() as string[]
+
+  function assignFolder(ws: Workspace, e: React.MouseEvent) {
+    e.preventDefault(); e.stopPropagation()
+    const f = window.prompt('폴더 이름을 입력하세요 (비우면 폴더에서 제거):', ws.folder || '')
+    if (f === null) return
+    updateWorkspace(ws.id, { folder: f.trim() || undefined })
+    if (!f.trim() && folderFilter === ws.folder) setFolderFilter(null)
+    refresh()
+  }
+
   const sorted = [...workspaces]
+    .filter(ws => !folderFilter || ws.folder === folderFilter)
     .filter(ws => ws.name.toLowerCase().includes(search.toLowerCase()) || ws.description?.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {
       if (sort === 'name') return a.name.localeCompare(b.name)
@@ -241,6 +254,26 @@ export default function DashboardPage() {
               </div>
             </div>
 
+            {folders.length > 0 && (
+              <div style={{ display:'flex', gap:8, marginBottom:16, flexWrap:'wrap', alignItems:'center' }}>
+                <button onClick={() => setFolderFilter(null)}
+                  style={{ padding:'6px 14px', borderRadius:20, cursor:'pointer', fontSize:'0.8rem', fontWeight:700,
+                    border: !folderFilter ? '1.5px solid var(--accent)' : '1px solid var(--border)',
+                    background: !folderFilter ? 'var(--accent-light)' : 'var(--bg-secondary)',
+                    color: !folderFilter ? 'var(--accent-text)' : 'var(--text-muted)' }}>
+                  전체
+                </button>
+                {folders.map(f => (
+                  <button key={f} onClick={() => setFolderFilter(folderFilter === f ? null : f)}
+                    style={{ padding:'6px 14px', borderRadius:20, cursor:'pointer', fontSize:'0.8rem', fontWeight:700,
+                      border: folderFilter === f ? '1.5px solid var(--accent)' : '1px solid var(--border)',
+                      background: folderFilter === f ? 'var(--accent-light)' : 'var(--bg-secondary)',
+                      color: folderFilter === f ? 'var(--accent-text)' : 'var(--text-muted)' }}>
+                    📁 {f} ({workspaces.filter(w => w.folder === f).length})
+                  </button>
+                ))}
+              </div>
+            )}
             <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(280px,1fr))', gap:16 }}>
               {/* Notes & Tools quick-access card */}
               <Link href="/notes/"
@@ -280,6 +313,10 @@ export default function DashboardPage() {
                     <div style={{ height:72, background: meta.gradient, position:'relative', display:'flex', alignItems:'center', padding:'0 18px', gap:12 }}>
                       <span style={{ fontSize:28 }}>{(ws as Workspace & {emoji?:string}).emoji || emoji}</span>
                       <div style={{ marginLeft:'auto', display:'flex', gap:6 }}>
+                        <button onClick={e => assignFolder(ws, e)} title="폴더 지정"
+                          style={{ width:28, height:28, borderRadius:8, border:'none', background:'rgba(255,255,255,.2)', color:'white', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontSize:13 }}>
+                          📁
+                        </button>
                         <button onClick={e => startRename(ws, e)} title={tr('common.rename')}
                           style={{ width:28, height:28, borderRadius:8, border:'none', background:'rgba(255,255,255,.2)', color:'white', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>

@@ -5,6 +5,7 @@ export type Workspace = {
   theme: string
   description?: string
   emoji?: string
+  folder?: string          // 대시보드 폴더 분류
   createdAt: string
 }
 

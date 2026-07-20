@@ -8,18 +8,17 @@ const PAYMENT_LINK = process.env.NEXT_PUBLIC_PREMIUM_PAYMENT_LINK || ''
 const FREE_FEATURES = [
   `워크스페이스 ${FREE_LIMITS.workspaces}개`,
   `워크스페이스당 문서 ${FREE_LIMITS.pagesPerWorkspace}개`,
-  '파일 업로드 개당 최대 10MB',
-  '클라우드 자동 백업',
+  '클라우드 자동 백업 (문서당 1MB)',
   '구글 · 이메일 로그인',
-  '노트 템플릿 13종',
+  '노트 템플릿 21종',
 ]
 
 const PREMIUM_FEATURES = [
   '워크스페이스 무제한',
   '문서 무제한',
-  '파일 업로드 개당 최대 100MB (대용량 PDF·강의자료)',
   'AI 편집 · 글쓰기 도우미 (전용)',
   'PDF 라이브러리 무제한',
+  '대용량 문서 우선 지원',
   '신기능 우선 체험',
 ]
 

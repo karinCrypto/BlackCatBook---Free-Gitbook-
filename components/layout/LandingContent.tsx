@@ -23,10 +23,6 @@ export default function LandingContent() {
         style={{ background: 'linear-gradient(180deg, #FFD9DF 0%, #FFE6EA 68%, var(--bg) 100%)' }}>
         <img src="/logo.png" alt="BlackCatBook 로고"
           style={{ width: 132, height: 132, objectFit: 'contain', marginBottom: 20, borderRadius: 32, boxShadow: '0 18px 44px rgba(31,17,20,0.18)' }} />
-        <div className="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full mb-6"
-          style={{ background: 'rgba(255,255,255,0.72)', color: '#B34557', border: '1px solid rgba(31,17,20,0.10)' }}>
-          {tr('landing.badge')}
-        </div>
         <h1 className="text-5xl md:text-6xl font-black mb-6 leading-tight" style={{ color: '#1F1114' }}>
           {tr('landing.hero.title1')}<br />
           <span style={{ color: '#E85D75' }}>BlackCatBook</span>
