@@ -10,8 +10,8 @@ export default function MobileTabBar() {
 
   const tabs = [
     { icon: '🏠', label: '홈', onClick: () => router.push('/dashboard'), active: pathname === '/dashboard' },
-    { icon: '📔', label: '노트도구', onClick: () => { window.location.href = '/notes/' }, active: false },
     { icon: '💎', label: '요금제', onClick: () => router.push('/pricing'), active: pathname === '/pricing' },
+    { icon: '❓', label: '도움말', onClick: () => { window.location.href = '/notes/' }, active: false },
     { icon: '🚪', label: '로그아웃', onClick: () => { void logout().then(() => router.push('/login')) }, active: false },
   ]
 

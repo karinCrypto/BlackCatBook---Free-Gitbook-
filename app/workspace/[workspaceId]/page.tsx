@@ -308,7 +308,7 @@ export default function WorkspacePage() {
       <div style={{ display:'flex', marginTop:60, flex:1 }}>
         {/* SIDEBAR */}
         {/* Desktop */}
-        <aside style={{ width: sidebarOpen ? 260 : 0, flexShrink:0, overflow:'hidden',
+        <aside className="md-show" style={{ width: sidebarOpen ? 260 : 0, flexShrink:0, overflow:'hidden',
           background:'var(--sidebar-bg)', borderRight: sidebarOpen ? '1px solid var(--border)' : 'none',
           position:'sticky', top:60, height:'calc(100vh - 60px)',
           transition:'width .25s', display:'flex', flexDirection:'column' }}>

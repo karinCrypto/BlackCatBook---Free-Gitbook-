@@ -209,3 +209,20 @@ body {
   .bcb-mobile-tabbar { display: flex; }
   .bcb-mobile-pad { padding-bottom: 76px; }
 }
+
+/* 모바일 읽기 최적화 — 티스토리/브런치 스타일 */
+@media (max-width: 767px) {
+  .prose, .editor-content {
+    font-size: 1.05rem !important;
+    line-height: 1.9 !important;
+    letter-spacing: -0.012em;
+    word-break: keep-all;
+  }
+  .prose h1 { font-size: 1.5rem !important; line-height: 1.35 !important; }
+  .prose h2 { font-size: 1.25rem !important; margin-top: 2em !important; }
+  .prose h3 { font-size: 1.1rem !important; }
+  .prose p { margin-bottom: 1.1em !important; }
+  .prose img, .editor-content img { border-radius: 12px; width: 100% !important; max-width: 100% !important; }
+  .prose table, .editor-content table { display: block; overflow-x: auto; white-space: nowrap; }
+  .prose blockquote { border-left: 3px solid var(--accent); padding: 4px 14px; color: var(--text-muted); }
+}

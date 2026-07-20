@@ -10,8 +10,6 @@ export default function LandingPage() {
         <div className="flex items-center gap-2 flex-1">
           <img src="/logo.png" alt="BlackCatBook" style={{ width:32, height:32, objectFit:'contain' }} />
           <span className="font-bold text-lg" style={{ color: 'var(--text)' }}>BlackCatBook</span>
-          <span className="text-xs font-semibold px-2 py-0.5 rounded-full ml-1"
-            style={{ background: 'var(--accent-light)', color: 'var(--accent-text)' }}>v1.0</span>
         </div>
         <div className="flex items-center gap-3">
           <LangSwitcher />

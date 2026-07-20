@@ -37,7 +37,7 @@ const TYPE_EMOJIS: Record<string, string> = {
 
 const EMOJIS = ['📖','✍️','🎨','🚀','💡','🔬','🎵','🌍','⚙️','🦋','🐱','🔥','💎','🌙','🌿']
 
-type Sort = 'recent' | 'name' | 'pages'
+type Sort = 'custom' | 'recent' | 'name' | 'pages'
 
 export default function DashboardPage() {
   const tr = useT()
@@ -51,7 +51,8 @@ export default function DashboardPage() {
   const [desc, setDesc] = useState('')
   const [wsEmoji, setWsEmoji] = useState('📖')
   const [emojiPicker, setEmojiPicker] = useState(false)
-  const [sort, setSort] = useState<Sort>('recent')
+  const [sort, setSort] = useState<Sort>('custom')
+  const dragWsId = useRef<string | null>(null)
   const [folderFilter, setFolderFilter] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [themePanel, setThemePanel] = useState(false)
@@ -129,8 +130,27 @@ export default function DashboardPage() {
     .sort((a, b) => {
       if (sort === 'name') return a.name.localeCompare(b.name)
       if (sort === 'pages') return (pageCounts[b.id] || 0) - (pageCounts[a.id] || 0)
+      if (sort === 'custom') {
+        const ao = (a as Workspace & { order?: number }).order
+        const bo = (b as Workspace & { order?: number }).order
+        if (ao !== undefined || bo !== undefined) return (ao ?? 1e9) - (bo ?? 1e9)
+      }
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     })
+
+  // 🖱️ 드래그로 우선순위 정렬 — 놓은 위치로 이동하고 순서를 저장
+  function handleDropOn(targetId: string) {
+    const fromId = dragWsId.current
+    dragWsId.current = null
+    if (!fromId || fromId === targetId) return
+    const ids = sorted.map(w => w.id)
+    const fromIdx = ids.indexOf(fromId), toIdx = ids.indexOf(targetId)
+    if (fromIdx < 0 || toIdx < 0) return
+    ids.splice(toIdx, 0, ids.splice(fromIdx, 1)[0])
+    ids.forEach((id, i) => updateWorkspace(id, { order: i } as Partial<Workspace>))
+    setSort('custom')
+    refresh()
+  }
 
   const totalPages = Object.values(pageCounts).reduce((s, c) => s + c, 0)
 
@@ -160,8 +180,6 @@ export default function DashboardPage() {
           <img src="/logo.png" alt="BlackCatBook" style={{ width:32, height:32, objectFit:'contain' }} />
           <span style={{ fontWeight:800, fontSize:'1.05rem', color:'var(--text)' }}>BlackCatBook</span>
         </a>
-        <span style={{ fontSize:'0.68rem', fontWeight:700, padding:'2px 8px', borderRadius:20,
-          background:'var(--accent-light)', color:'var(--accent-text)' }}>v1.0</span>
         <div style={{ marginLeft:'auto', display:'flex', gap:8, alignItems:'center' }}>
           <FontSizeControl />
           <LangSwitcher />
@@ -242,13 +260,13 @@ export default function DashboardPage() {
                 {search && <button onClick={() => setSearch('')} style={{ background:'none', border:'none', cursor:'pointer', color:'var(--text-faint)', fontSize:16 }}>×</button>}
               </div>
               <div style={{ display:'flex', gap:4 }}>
-                {(['recent','name','pages'] as Sort[]).map(s => (
+                {(['custom','recent','name','pages'] as Sort[]).map(s => (
                   <button key={s} onClick={() => setSort(s)}
                     style={{ padding:'8px 14px', borderRadius:10, border:'1px solid var(--border)',
                       background: sort===s ? 'var(--accent-light)' : 'var(--bg-secondary)',
                       color: sort===s ? 'var(--accent-text)' : 'var(--text-muted)',
                       cursor:'pointer', fontSize:'0.8rem', fontWeight:600 }}>
-                    {s==='recent' ? tr('dashboard.sort.recent') : s==='name' ? tr('dashboard.sort.name') : tr('dashboard.sort.pages')}
+                    {s==='custom' ? '↕ 내 순서' : s==='recent' ? tr('dashboard.sort.recent') : s==='name' ? tr('dashboard.sort.name') : tr('dashboard.sort.pages')}
                   </button>
                 ))}
               </div>
@@ -305,6 +323,10 @@ export default function DashboardPage() {
                 const isRenaming = renameId === ws.id
                 return (
                   <Link key={ws.id} href={`/workspace/${ws.id}`}
+                    draggable
+                    onDragStart={() => { dragWsId.current = ws.id }}
+                    onDragOver={e => e.preventDefault()}
+                    onDrop={e => { e.preventDefault(); handleDropOn(ws.id) }}
                     style={{ display:'block', borderRadius:16, textDecoration:'none',
                       background:'var(--bg-secondary)', border:'1px solid var(--border)',
                       overflow:'hidden', transition:'transform .18s, box-shadow .18s', position:'relative' }}
