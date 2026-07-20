@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Page } from '@/lib/localStorage/pages'
 
 type Props = {
@@ -7,16 +7,35 @@ type Props = {
   onEdit: () => void
 }
 
+type TocItem = { id: string; text: string; level: number }
+
 export default function DocViewer({ page, onEdit }: Props) {
   const contentRef = useRef<HTMLDivElement>(null)
+  const [toc, setToc] = useState<TocItem[]>([])
+  const [tocOpen, setTocOpen] = useState(true)
 
-  // Assign heading IDs for TOC anchor links
+  // Assign heading IDs and build TOC
   useEffect(() => {
-    if (!contentRef.current) return
+    if (!contentRef.current) { setToc([]); return }
+    const items: TocItem[] = []
     contentRef.current.querySelectorAll('h1,h2,h3').forEach((el, i) => {
       if (!el.id) el.id = `h-${i}`
+      const text = (el.textContent || '').trim()
+      if (text) items.push({ id: el.id, text, level: Number(el.tagName[1]) })
     })
+    setToc(items)
   }, [page.content])
+
+  function jumpTo(id: string) {
+    const el = document.getElementById(id)
+    if (!el) return
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    // 도착 지점 하이라이트 플래시
+    const orig = (el as HTMLElement).style.background
+    ;(el as HTMLElement).style.transition = 'background 1.2s'
+    ;(el as HTMLElement).style.background = 'var(--accent-light)'
+    setTimeout(() => { (el as HTMLElement).style.background = orig }, 1200)
+  }
 
   const updatedAt = new Date(page.updatedAt)
   const formatted = updatedAt.toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric' })
@@ -80,6 +99,37 @@ export default function DocViewer({ page, onEdit }: Props) {
           </span>
         )}
       </div>
+
+      {/* TOC — 목차 클릭 시 해당 위치로 스크롤 */}
+      {toc.length >= 2 && (
+        <nav style={{ marginBottom: 28, padding: '14px 18px', borderRadius: 12,
+          background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
+          <button onClick={() => setTocOpen(o => !o)}
+            style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%',
+              background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+              fontSize: '0.82rem', fontWeight: 800, color: 'var(--text)' }}>
+            <span>📑 목차</span>
+            <span style={{ marginLeft: 'auto', color: 'var(--text-faint)', fontSize: '0.75rem' }}>{tocOpen ? '접기 ▲' : '펼치기 ▼'}</span>
+          </button>
+          {tocOpen && (
+            <ul style={{ listStyle: 'none', margin: '10px 0 0', padding: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {toc.map(item => (
+                <li key={item.id} style={{ paddingLeft: (item.level - 1) * 14 }}>
+                  <button onClick={() => jumpTo(item.id)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '3px 6px',
+                      borderRadius: 6, fontSize: item.level === 1 ? '0.85rem' : '0.8rem',
+                      fontWeight: item.level === 1 ? 700 : 500, textAlign: 'left',
+                      color: 'var(--text-muted)', transition: 'color .12s' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--accent-text)' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)' }}>
+                    {item.text}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </nav>
+      )}
 
       {/* Content */}
       {page.content ? (

@@ -189,6 +189,19 @@ export default function RichEditor({ page, onSave, onDone, onRegisterInsert }: P
     autoSave()
   }
 
+  function insertVideo() {
+    const url = window.prompt('유튜브 영상 주소를 붙여넣으세요:\n예) https://youtu.be/abc123 또는 https://www.youtube.com/watch?v=abc123')
+    if (!url) return
+    const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([A-Za-z0-9_-]{6,20})/)
+    if (!m) { alert('유튜브 주소를 인식하지 못했어요. 전체 URL을 붙여넣어 주세요.'); return }
+    editorRef.current?.focus()
+    const html = `<div style="position:relative;padding-bottom:56.25%;height:0;margin:12px 0;border-radius:10px;overflow:hidden">`
+      + `<iframe src="https://www.youtube.com/embed/${m[1]}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>`
+      + `</div><p></p>`
+    document.execCommand('insertHTML', false, html)
+    autoSave()
+  }
+
   function insertTable() {
     editorRef.current?.focus()
     const html = `<table><thead><tr><th>제목 1</th><th>제목 2</th><th>제목 3</th></tr></thead><tbody><tr><td>내용</td><td>내용</td><td>내용</td></tr><tr><td>내용</td><td>내용</td><td>내용</td></tr></tbody></table><p></p>`
@@ -405,6 +418,8 @@ export default function RichEditor({ page, onSave, onDone, onRegisterInsert }: P
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>)}
         {btn('이미지', () => fileInputRef.current?.click(),
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>)}
+        {btn('유튜브 동영상', insertVideo,
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="4" width="20" height="16" rx="3"/><polygon points="10 9 15 12 10 15 10 9" fill="currentColor"/></svg>)}
         {btn('코드 블록', insertCodeBlock,
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>)}
         {btn('표', insertTable,
