@@ -187,13 +187,15 @@ export default function DashboardPage() {
       {/* HEADER */}
       <header style={{ height:60, background:'var(--header-bg)', borderBottom:'1px solid var(--border)',
         position:'sticky', top:0, zIndex:50, display:'flex', alignItems:'center', padding:'0 24px', gap:12 }}>
-        <a href="/dashboard" style={{ display:'flex', alignItems:'center', gap:12, textDecoration:'none' }}>
+        <a href="/dashboard" style={{ display:'flex', alignItems:'center', gap:12, textDecoration:'none', flexShrink:0 }}>
           <img src="/logo.png" alt="BlackCatBook" style={{ width:32, height:32, objectFit:'contain' }} />
           <span style={{ fontWeight:800, fontSize:'1.05rem', color:'var(--text)' }}>BlackCatBook</span>
         </a>
-        <div style={{ marginLeft:'auto', display:'flex', gap:8, alignItems:'center' }}>
-          <FontSizeControl />
-          <LangSwitcher />
+        <div style={{ marginLeft:'auto', display:'flex', gap:8, alignItems:'center', minWidth:0, overflow:'hidden', justifyContent:'flex-end' }}>
+          <span className="md-show" style={{ display:'flex', gap:8, alignItems:'center' }}>
+            <FontSizeControl />
+            <LangSwitcher />
+          </span>
           <UserChip />
           <button onClick={() => setModal(true)}
             style={{ fontSize:'0.85rem', fontWeight:700, padding:'8px 16px', borderRadius:8,
