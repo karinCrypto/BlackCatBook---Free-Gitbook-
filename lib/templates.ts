@@ -1,4 +1,6 @@
 // 노트 템플릿 갤러리 — 선택하면 해당 구조의 새 페이지가 즉시 생성된다.
+export type TemplateVariant = { id: string; label: string; title: string; html: string }
+
 export type NoteTemplate = {
   id: string
   emoji: string
@@ -6,6 +8,7 @@ export type NoteTemplate = {
   desc: string
   title: string
   html: string
+  variants?: TemplateVariant[]   // 있으면 드롭다운으로 종류 선택
 }
 
 const days = ['월', '화', '수', '목', '금', '토', '일']
@@ -19,6 +22,50 @@ const studentTimetable = () => {
 }
 
 const weekRows = () => days.map(d => `<tr><td><strong>${d}</strong></td><td>&nbsp;</td><td>&nbsp;</td></tr>`).join('')
+
+// 시험 대비 템플릿 생성기 — 과목 목록만 넣으면 진도표·회독·오답노트 구조를 만든다
+function examHtml(examName: string, subjects: string[]): string {
+  return [
+    `<h2>🎯 목표</h2>`,
+    `<p><strong>시험:</strong> ${examName} / <strong>시험일:</strong> ____년 __월 __일 (D-___) / <strong>목표 점수:</strong>&nbsp;</p>`,
+    '<h2>📚 과목별 진도표</h2>',
+    '<table><tr><th>과목</th><th>교재/강의</th><th>진도율</th><th>1회독</th><th>2회독</th><th>3회독</th></tr>',
+    subjects.map(s => `<tr><td><strong>${s}</strong></td><td>&nbsp;</td><td>___%</td><td>☐</td><td>☐</td><td>☐</td></tr>`).join(''),
+    '</table>',
+    '<h2>🗓️ 이번 주 학습 계획</h2>',
+    `<table><tr><th>요일</th><th>과목</th><th>범위</th><th>완료</th></tr>${days.map(d => `<tr><td>${d}</td><td>&nbsp;</td><td>&nbsp;</td><td>☐</td></tr>`).join('')}</table>`,
+    '<h2>❌ 오답노트</h2>',
+    '<table><tr><th>과목</th><th>문제/개념</th><th>왜 틀렸나</th><th>다시 풀 날짜</th></tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></table>',
+    '<h2>🧠 모의고사 기록</h2>',
+    '<table><tr><th>날짜</th><th>회차</th><th>점수</th><th>메모</th></tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></table>',
+  ].join('\n')
+}
+
+const PRO_EXAMS: [string, string, string[]][] = [
+  ['bar', '변호사시험', ['공법', '민사법', '형사법', '선택과목']],
+  ['cpa', '공인회계사(CPA)', ['회계학', '세법', '경영학', '경제원론', '상법']],
+  ['tax', '세무사', ['재정학', '세법학개론', '회계학개론', '상법']],
+  ['labor', '공인노무사', ['노동법', '민법', '사회보험법', '경영학/경제학']],
+  ['appraiser', '감정평가사', ['민법', '경제학원론', '부동산학원론', '감정평가이론']],
+  ['patent', '변리사', ['산업재산권법', '민법개론', '자연과학개론', '특허법']],
+  ['gosi5', '5급 공채(행정고시)', ['언어논리(PSAT)', '자료해석(PSAT)', '상황판단(PSAT)', '전공과목']],
+  ['doctor', '의사 국가고시', ['의학총론', '의학각론', '보건의약관계법규', '실기']],
+  ['nurse', '간호사 국가고시', ['성인간호학', '모성/아동간호학', '지역사회간호학', '정신간호학', '간호관리학', '기본간호학']],
+]
+
+const CERT_EXAMS: [string, string, string[]][] = [
+  ['engineer-info', '정보처리기사', ['소프트웨어 설계', '소프트웨어 개발', '데이터베이스 구축', '프로그래밍 언어 활용', '정보시스템 구축관리']],
+  ['computer', '컴퓨터활용능력', ['컴퓨터 일반', '스프레드시트 일반', '데이터베이스 일반(1급)']],
+  ['history', '한국사능력검정시험', ['전근대사', '근현대사', '시대 통합 주제']],
+  ['toeic', 'TOEIC', ['LC Part 1-2', 'LC Part 3-4', 'RC Part 5-6', 'RC Part 7']],
+  ['electric', '전기기사', ['전기자기학', '전력공학', '전기기기', '회로이론/제어공학', '전기설비기술기준']],
+  ['safety', '산업안전기사', ['안전관리론', '인간공학', '기계위험방지', '전기위험방지', '화학설비안전', '건설안전']],
+  ['sqld', 'SQLD', ['데이터 모델링의 이해', 'SQL 기본 및 활용']],
+  ['cook', '조리기능사', ['위생 및 안전관리', '재료관리', '조리이론', '실기 레시피']],
+]
+
+const toVariants = (list: [string, string, string[]][]): TemplateVariant[] =>
+  list.map(([id, name, subjects]) => ({ id, label: name, title: `🏆 ${name} 합격 플래너`, html: examHtml(name, subjects) }))
 
 export const NOTE_TEMPLATES: NoteTemplate[] = [
   {
@@ -225,5 +272,23 @@ export const NOTE_TEMPLATES: NoteTemplate[] = [
       '<h2>📇 연락처 메모</h2>',
       '<table><tr><th>업체/담당</th><th>연락처</th><th>메모</th></tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></table>',
     ].join('\n'),
+  },
+  {
+    id: 'pro-exam',
+    emoji: '⚖️',
+    label: '전문직 시험',
+    desc: '시험 종류를 골라 맞춤 플래너 생성',
+    title: '🏆 전문직 시험 합격 플래너',
+    html: examHtml('전문직 시험', ['과목 1', '과목 2', '과목 3']),
+    variants: toVariants(PRO_EXAMS),
+  },
+  {
+    id: 'cert-exam',
+    emoji: '📜',
+    label: '자격증 시험',
+    desc: '자격증 종류를 골라 맞춤 플래너 생성',
+    title: '🏆 자격증 합격 플래너',
+    html: examHtml('자격증 시험', ['과목 1', '과목 2']),
+    variants: toVariants(CERT_EXAMS),
   },
 ]

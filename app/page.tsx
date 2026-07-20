@@ -19,7 +19,7 @@ export default function LandingPage() {
             로그인
           </Link>
           <Link href="/dashboard" className="text-sm font-semibold px-4 py-2 rounded-lg" style={{ background: 'var(--accent)', color: 'white' }}>
-            무료 시작
+            시작하기
           </Link>
         </div>
       </header>

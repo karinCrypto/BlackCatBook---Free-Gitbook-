@@ -13,6 +13,7 @@ import PdfLibraryPage from '@/components/pdf/PdfLibraryPage'
 import FontSizeControl from '@/components/layout/FontSizeControl'
 import { usePlan, FREE_LIMITS } from '@/lib/firebase/premium'
 import { NOTE_TEMPLATES, type NoteTemplate } from '@/lib/templates'
+import DrawingOverlay from '@/components/editor/DrawingOverlay'
 import type { Page } from '@/lib/localStorage/pages'
 
 const THEMES = [
@@ -38,6 +39,8 @@ export default function WorkspacePage() {
   const [shareOpen, setShareOpen] = useState(false)
   const [aiPanelOpen, setAiPanelOpen] = useState(false)
   const [templateModal, setTemplateModal] = useState(false)
+  const [penMode, setPenMode] = useState(false)
+  const [variantPick, setVariantPick] = useState<{ tpl: NoteTemplate; variantId: string } | null>(null)
   type FeatureView = 'pages' | 'pdf-library' | 'dream-note' | 'gratitude' | 'drawing'
   const [activeView, setActiveView] = useState<FeatureView>('pages')
   const fileImportRef = useRef<HTMLInputElement>(null)
@@ -90,15 +93,15 @@ export default function WorkspacePage() {
     return p.id
   }
 
-  function handleCreateFromTemplate(t: NoteTemplate) {
+  function handleCreateFromTemplate(t: NoteTemplate, title?: string, html?: string) {
     if (plan === 'free' && pages.filter(p => p.type === 'page').length >= FREE_LIMITS.pagesPerWorkspace) {
-      setTemplateModal(false)
+      setTemplateModal(false); setVariantPick(null)
       if (confirm(`무료 플랜은 워크스페이스당 문서 ${FREE_LIMITS.pagesPerWorkspace}개까지 만들 수 있어요.\n프리미엄으로 업그레이드하시겠어요?`)) router.push('/pricing')
       return
     }
     const order = pages.filter(p => p.parentId === null).length
-    const p = createPage({ workspaceId, parentId: null, type: 'page', order, title: t.title, content: t.html })
-    setTemplateModal(false)
+    const p = createPage({ workspaceId, parentId: null, type: 'page', order, title: title ?? t.title, content: html ?? t.html })
+    setTemplateModal(false); setVariantPick(null)
     setCurrentPageId(p.id)
     setIsEditing(true)
   }
@@ -230,6 +233,12 @@ export default function WorkspacePage() {
         <span className="ws-header-wsname" style={{ fontSize:'0.875rem', color:'var(--text-muted)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:180 }}>{wsName}</span>
 
         <div style={{ marginLeft:'auto', display:'flex', gap:6, alignItems:'center' }}>
+          <button onClick={() => setPenMode(true)} title="화면 판서 (강의 모드) — 지금 보는 화면 위에 그려요"
+            style={{ display:'flex', alignItems:'center', gap:5, padding:'6px 12px', borderRadius:8,
+              border:'1px solid var(--border)', background:'var(--bg-tertiary)', color:'var(--text)',
+              cursor:'pointer', fontSize:'0.78rem', fontWeight:700, whiteSpace:'nowrap' }}>
+            🖊️ 판서
+          </button>
           <button onClick={() => setTemplateModal(true)} title="노트 템플릿"
             style={{ display:'flex', alignItems:'center', gap:5, padding:'6px 12px', borderRadius:8,
               border:'1px solid var(--border)', background:'var(--bg-tertiary)', color:'var(--text)',
@@ -493,6 +502,9 @@ export default function WorkspacePage() {
         />
       )}
 
+      {/* 화면 판서 오버레이 — 강의자용 */}
+      {penMode && <DrawingOverlay onClose={() => setPenMode(false)} />}
+
       {/* TEMPLATE GALLERY MODAL */}
       {templateModal && (
         <div onClick={() => setTemplateModal(false)}
@@ -511,17 +523,46 @@ export default function WorkspacePage() {
             </div>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(180px,1fr))', gap:10 }}>
               {NOTE_TEMPLATES.map(t => (
-                <button key={t.id} onClick={() => handleCreateFromTemplate(t)}
+                <button key={t.id}
+                  onClick={() => t.variants ? setVariantPick({ tpl: t, variantId: t.variants[0].id }) : handleCreateFromTemplate(t)}
                   style={{ padding:'16px 14px', borderRadius:14, textAlign:'left', cursor:'pointer',
-                    border:'1.5px solid var(--border)', background:'var(--bg)', transition:'border-color .15s' }}
+                    border: variantPick?.tpl.id === t.id ? '1.5px solid var(--accent)' : '1.5px solid var(--border)',
+                    background:'var(--bg)', transition:'border-color .15s' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--accent)' }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)' }}>
+                  onMouseLeave={e => { if (variantPick?.tpl.id !== t.id) (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)' }}>
                   <div style={{ fontSize:26, marginBottom:8 }}>{t.emoji}</div>
                   <div style={{ fontWeight:800, fontSize:'0.88rem', color:'var(--text)', marginBottom:3 }}>{t.label}</div>
                   <div style={{ fontSize:'0.72rem', color:'var(--text-muted)', lineHeight:1.5 }}>{t.desc}</div>
+                  {t.variants && <div style={{ fontSize:'0.68rem', color:'var(--accent-text)', marginTop:5, fontWeight:700 }}>▾ 종류 선택 ({t.variants.length}종)</div>}
                 </button>
               ))}
             </div>
+            {variantPick && (
+              <div style={{ marginTop:16, padding:'14px 16px', borderRadius:14,
+                border:'1.5px solid var(--accent)', background:'var(--accent-light)' }}>
+                <div style={{ fontWeight:800, fontSize:'0.85rem', color:'var(--text)', marginBottom:8 }}>
+                  {variantPick.tpl.emoji} {variantPick.tpl.label} — 종류를 골라주세요
+                </div>
+                <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+                  <select value={variantPick.variantId}
+                    onChange={e => setVariantPick(v => v && { ...v, variantId: e.target.value })}
+                    style={{ flex:1, minWidth:200, padding:'9px 12px', borderRadius:8, cursor:'pointer',
+                      border:'1px solid var(--border)', background:'var(--bg)', color:'var(--text)', fontSize:'0.875rem' }}>
+                    {variantPick.tpl.variants!.map(v => (
+                      <option key={v.id} value={v.id}>{v.label}</option>
+                    ))}
+                  </select>
+                  <button onClick={() => {
+                    const v = variantPick.tpl.variants!.find(x => x.id === variantPick.variantId)!
+                    handleCreateFromTemplate(variantPick.tpl, v.title, v.html)
+                  }}
+                    style={{ padding:'9px 20px', borderRadius:8, border:'none', cursor:'pointer',
+                      background:'var(--accent)', color:'white', fontWeight:800, fontSize:'0.85rem', whiteSpace:'nowrap' }}>
+                    이 시험으로 만들기
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

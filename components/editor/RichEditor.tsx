@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import DOMPurify from 'isomorphic-dompurify'
 import type { Page } from '@/lib/localStorage/pages'
+import { uploadFile, FREE_FILE_LIMIT_MB, PREMIUM_FILE_LIMIT_MB } from '@/lib/firebase/upload'
 
 const HIGHLIGHT_COLORS = [
   { color: '#fef08a', label: '노랑' },
@@ -147,12 +148,25 @@ export default function RichEditor({ page, onSave, onDone, onRegisterInsert }: P
     setHighlightOpen(false)
   }
 
-  function insertImage(file: File) {
+  async function insertImage(file: File) {
+    // 로그인 사용자는 클라우드(Storage)에 업로드 — 문서가 가벼워지고 용량 한도가 넉넉해진다
+    const up = await uploadFile(file)
+    if (up.ok) { insertImageSrc(up.url, file.name); return }
+    if (up.reason === 'too-large') {
+      alert(`파일이 플랜 한도를 초과했어요.\n무료: 파일당 ${FREE_FILE_LIMIT_MB}MB / 프리미엄: 파일당 ${PREMIUM_FILE_LIMIT_MB}MB`)
+      return
+    }
+    // 미로그인/오류 시 기존 방식(문서에 직접 포함)으로 폴백
     const reader = new FileReader()
-    reader.onload = e => {
+    reader.onload = e => insertImageSrc(e.target?.result as string, file.name)
+    reader.readAsDataURL(file)
+  }
+
+  function insertImageSrc(src: string, alt: string) {
+    {
       const img = document.createElement('img')
-      img.src = e.target?.result as string
-      img.alt = file.name
+      img.src = src
+      img.alt = alt
       img.style.maxWidth = '100%'
       img.style.borderRadius = '8px'
       img.style.margin = '8px 0'
@@ -167,7 +181,6 @@ export default function RichEditor({ page, onSave, onDone, onRegisterInsert }: P
       }
       autoSave()
     }
-    reader.readAsDataURL(file)
   }
 
   function insertCodeBlock() {

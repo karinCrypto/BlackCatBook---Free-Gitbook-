@@ -12,7 +12,7 @@ export default function LangSwitcher() {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 2,
       background: 'var(--bg-tertiary)', borderRadius: 8, padding: 2, border: '1px solid var(--border)' }}>
-      {(['ko', 'en'] as Lang[]).map(l => (
+      {(['ko', 'en', 'ja', 'zh'] as Lang[]).map(l => (
         <button key={l} onClick={() => setLang(l)}
           style={{
             padding: '4px 10px', borderRadius: 6, border: 'none', cursor: 'pointer',
@@ -21,7 +21,7 @@ export default function LangSwitcher() {
             color: lang === l ? 'white' : 'var(--text-muted)',
             transition: 'all .15s',
           }}>
-          {l === 'ko' ? '한' : 'EN'}
+          {l === 'ko' ? '한' : l === 'en' ? 'EN' : l === 'ja' ? '日' : '中'}
         </button>
       ))}
     </div>
