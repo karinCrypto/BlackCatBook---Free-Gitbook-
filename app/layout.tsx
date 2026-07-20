@@ -3,14 +3,22 @@ import './globals.css'
 import AuthProvider from '@/components/auth/AuthProvider'
 
 export const metadata: Metadata = {
-  title: { default: 'BlackCatBook', template: '%s | BlackCatBook' },
-  description: '마크다운 기반 문서화 플랫폼 — 기술 문서, 블로그, 포트폴리오를 한 곳에서',
-  keywords: ['documentation', 'docs', 'markdown', 'blog', 'portfolio'],
+  metadataBase: new URL('https://blackcatbook.io'),
+  title: { default: 'BlackCatBook — 붙여넣으면 3초 만에 문서 완성', template: '%s | BlackCatBook' },
+  description: '메모를 붙여넣으면 AI가 블로그·보고서·기술문서로 즉시 변환! 무료 AI 편집, SEO 자동 생성, 클라우드 저장까지. 지금 무료로 시작하세요 🐾',
+  keywords: ['documentation', 'docs', 'markdown', 'blog', 'portfolio', 'AI 글쓰기', 'SEO'],
   openGraph: {
     type: 'website',
     siteName: 'BlackCatBook',
-    title: 'BlackCatBook',
-    description: '마크다운 기반 문서화 플랫폼',
+    title: 'BlackCatBook — 붙여넣으면 3초 만에 문서 완성',
+    description: '메모를 붙여넣으면 AI가 블로그·보고서로 즉시 변환! 무료 AI 편집 · SEO 자동 생성 · 클라우드 저장. 지금 무료로 시작하세요 🐾',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'BlackCatBook — 붙여넣으면 3초 만에 문서 완성' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'BlackCatBook — 붙여넣으면 3초 만에 문서 완성',
+    description: '무료 AI 편집 · SEO 자동 생성 · 클라우드 저장 🐾',
+    images: ['/og-image.png'],
   },
 }
 
