@@ -80,7 +80,7 @@ export default function PricingPage() {
               추천
             </span>
             <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#f43f5e', marginBottom: 6 }}>프리미엄</div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--text)', marginBottom: 18 }}>₩4,900<span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-faint)' }}> /월</span></div>
+            <div style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--text)', marginBottom: 18 }}>₩12,900<span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-faint)' }}> /월</span></div>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
               {PREMIUM_FEATURES.map(f => (
                 <li key={f} style={{ fontSize: '0.85rem', color: 'var(--text)' }}>✓ {f}</li>

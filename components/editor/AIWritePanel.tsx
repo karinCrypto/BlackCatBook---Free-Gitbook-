@@ -196,7 +196,7 @@ export default function AIWritePanel({ onInsert, onClose }: Props) {
           </div>
           <button onClick={() => router.push('/pricing')}
             style={{ marginTop: 6, padding: '12px 28px', borderRadius: 12, border: 'none', cursor: 'pointer', background: '#f43f5e', color: 'white', fontWeight: 800, fontSize: '0.9rem' }}>
-            ₩4,900/월로 잠금 해제 →
+            ₩12,900/월로 잠금 해제 →
           </button>
           <div style={{ fontSize: '0.72rem', color: 'var(--text-faint)' }}>언제든 해지 가능 · 구독 즉시 사용 가능</div>
         </div>
